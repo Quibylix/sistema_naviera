@@ -1,0 +1,35 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Byte-compiled / cached
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración de VS Code
+.vscode/
+
+# Bases de datos SQLite
+*.sqlite3
+
+# Archivos de migraciones (opcional si quieres versionarlas)
+# */migrations/*.py
+# */migrations/*.pyc
+
+# Archivos estáticos recopilados y medios de usuario
+staticfiles/
+media/
+
+# Archivos de logs
+*.log
+
+# Coverage
+htmlcov/
+.coverage
+
+# IDEs y sistemas operativos
+.idea/
+.DS_Store
+Thumbs.db
