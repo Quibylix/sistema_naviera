@@ -14,6 +14,12 @@ class PuertoAdmin(admin.ModelAdmin):
     list_filter = ("pais",)
     search_fields = ("nombre_puerto",)
 
+class SegmentoRutaInline(admin.TabularInline):
+    model = SegmentoRuta
+    extra = 1
+    autocomplete_fields = ["puerto"]
+    ordering = ("orden_ruta",)
+
 @admin.register(Ruta)
 class RutaAdmin(admin.ModelAdmin):
     list_display = ("id_ruta", "nombre_ruta")
@@ -21,9 +27,11 @@ class RutaAdmin(admin.ModelAdmin):
 
 @admin.register(SegmentoRuta)
 class SegmentoRutaAdmin(admin.ModelAdmin):
-    list_display = ("id_segmento_ruta", "ruta", "puerto", "orden_ruta")
+    list_display = ("ruta", "puerto", "orden_ruta")
     list_filter = ("ruta", "puerto")
-    search_fields = ("id_segmento_ruta",)
+    search_fields = ("ruta__nombre_ruta", "puerto__nombre_puerto")
+    ordering = ("ruta", "orden_ruta")
+    autocomplete_fields = ["puerto"]
 
 @admin.register(Buque)
 class BuqueAdmin(admin.ModelAdmin):
@@ -39,7 +47,7 @@ class EmbarqueAdmin(admin.ModelAdmin):
 
 @admin.register(Escala)
 class EscalaAdmin(admin.ModelAdmin):
-    list_display = ("id_escala", "puerto", "embarque", "orden_escala")
+    list_display = ( "puerto", "embarque", "orden_escala")
     list_filter = ("puerto", "embarque")
     search_fields = ("id_escala",)
 

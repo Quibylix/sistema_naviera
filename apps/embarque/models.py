@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models,transaction
 
 class Pais(models.Model):
     id_pais = models.CharField(primary_key=True, max_length=2)
@@ -12,30 +12,72 @@ class Pais(models.Model):
 
 
 class Puerto(models.Model):
-    id_puerto = models.CharField(primary_key=True, max_length=10)
-    pais = models.ForeignKey(Pais, on_delete=models.PROTECT, related_name="puertos")
+    id_puerto = models.CharField(
+        primary_key=True,
+        max_length=10,
+        editable=False          # no visible en formularios
+    )
+    pais = models.ForeignKey(
+        "Pais",
+        on_delete=models.PROTECT,
+        related_name="puertos",
+    )
     nombre_puerto = models.CharField(max_length=20)
+
+    PAD = 3                    # cantidad de dígitos ➜ 001, 002, ...
 
     def __str__(self):
         return self.nombre_puerto
+
+    def save(self, *args, **kwargs):
+        if not self.id_puerto:
+            with transaction.atomic():
+                prefix = self.pais.id_pais           # e.g. "SV"
+                ultimo = (
+                    Puerto.objects
+                    .select_for_update()
+                    .filter(id_puerto__startswith=prefix)
+                    .order_by("-id_puerto")
+                    .first()
+                )
+                if ultimo:
+                    sec = int(ultimo.id_puerto[len(prefix):]) + 1
+                else:
+                    sec = 1
+                self.id_puerto = f"{prefix}{sec:0{self.PAD}d}"
+        super().save(*args, **kwargs)
 
 
 class Ruta(models.Model):
     id_ruta = models.AutoField(primary_key=True)
     nombre_ruta = models.CharField(max_length=20)
-
+    puertos = models.ManyToManyField(
+        "Puerto",
+        through="SegmentoRuta",
+        related_name="rutas",
+    )
     def __str__(self):
         return self.nombre_ruta
-
+    
+    def puertos_ordenados(self):
+        return (
+            self.segmentos            # related_name en SegmentoRuta
+            .select_related("puerto")
+            .order_by("orden_ruta")
+            .values_list("puerto__nombre_puerto", flat=True)
+        )
 
 class SegmentoRuta(models.Model):
-    id_segmento_ruta = models.CharField(primary_key=True, max_length=5)
-    puerto = models.ForeignKey(Puerto, on_delete=models.PROTECT, related_name="segmentos")
-    ruta = models.ForeignKey(Ruta, on_delete=models.CASCADE, related_name="segmentos")
+    puerto = models.ForeignKey(
+        Puerto, on_delete=models.PROTECT, related_name="segmentos"
+    )
+    ruta = models.ForeignKey(
+        Ruta, on_delete=models.CASCADE, related_name="segmentos"
+    )
     orden_ruta = models.PositiveIntegerField()
 
     class Meta:
-        unique_together = ("puerto", "ruta", "orden_ruta")
+        unique_together = ("ruta", "orden_ruta")   # una sola posición por ruta
         ordering = ["ruta", "orden_ruta"]
 
     def __str__(self):
@@ -96,18 +138,49 @@ class Embarque(models.Model):
 
 
 class Escala(models.Model):
-    id_escala = models.CharField(primary_key=True, max_length=5)
     puerto = models.ForeignKey(Puerto, on_delete=models.PROTECT, related_name="escalas")
     embarque = models.ForeignKey(Embarque, on_delete=models.CASCADE, related_name="escalas")
-    orden_escala = models.PositiveIntegerField()
+    # el usuario NO lo edita directamente
+    orden_escala = models.PositiveIntegerField(editable=False)
 
     class Meta:
-        unique_together = ("puerto", "embarque", "orden_escala")
-        ordering = ["embarque", "orden_escala"]
+        unique_together = ("embarque", "orden_escala")
+        ordering = ["orden_escala"]
 
-    def __str__(self):
-        return f"Escala {self.orden_escala} – {self.puerto} ({self.embarque})"
+    # ---------------------------
+    # a)  validación + asignación
+    # ---------------------------
+    def clean(self):
+        """
+        Ajusta orden_escala al valor de orden_ruta
+        que le corresponde al (ruta, puerto).
+        """
+        # 1. Asegúrate de que Embarque tenga ruta
+        if not self.embarque or not self.embarque.ruta:
+            raise ValidationError("El embarque debe tener una ruta asignada.")
 
+        # 2. Busca el segmento
+        try:
+            seg = SegmentoRuta.objects.get(
+                ruta=self.embarque.ruta,
+                puerto=self.puerto
+            )
+        except SegmentoRuta.DoesNotExist:
+            raise ValidationError(
+                f"El puerto {self.puerto} "
+                f"no pertenece a la ruta {self.embarque.ruta}."
+            )
+
+        # 3. Copia el orden
+        self.orden_escala = seg.orden_ruta
+
+    # ---------------------------
+    # b)  por si quieres más control
+    # ---------------------------
+    def save(self, *args, **kwargs):
+        # Llama a clean() para garantizar la sincronía
+        self.clean()
+        super().save(*args, **kwargs)
 
 class ManifiestoCarga(models.Model):
     id_mc = models.CharField(primary_key=True, max_length=6)

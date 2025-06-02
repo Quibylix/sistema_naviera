@@ -31,6 +31,7 @@ AUTH_USER_MODEL = 'usuarios.CustomUser'
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.contenedor',
     'apps.usuarios',
     'apps.embarque',
     'django.contrib.admin',
