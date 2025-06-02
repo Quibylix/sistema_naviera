@@ -1,5 +1,5 @@
 """
-ASGI config for sistema_naviera project.
+ASGI config for sistema project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sistema_naviera.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sistema.settings')
 
 application = get_asgi_application()
