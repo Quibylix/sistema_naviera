@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Editar mercancía {{ object.pk }}</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Guardar cambios</button>
+  <a href="{% url 'mercancia_manage' object.contenedor.pk %}">Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+<!-- templates/404.html -->
+{% extends "base.html" %}
+{% block title %}Página no encontrada{% endblock %}
+{% block content %}
+  <div style="text-align:center; margin-top:2rem;">
+    <h1>¡Ups! No encontramos esa página.</h1>
+    <p>La ruta que solicitaste no existe.</p>
+    <a href="{% url 'home' %}">← Volver al inicio</a>
+  </div>
+{% endblock %}

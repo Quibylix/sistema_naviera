@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Portal de Gestión de Carga</h1>
+<a href="{% url 'usuarios:login_origen' %}?next=/panel/&rol=origen">Portal Agente Origen</a>
+<a href="{% url 'usuarios:login_destino' %}?next=/panel/&rol=destino">Portal Agente Destino</a>
+{% endblock %}

@@ -1,0 +1,14 @@
+{# templates/embarques/embarque_confirm_delete.html #}
+{% extends "base.html" %}
+{% block title %}Eliminar Embarque{% endblock %}
+
+{% block content %}
+<h2>Eliminar Embarque</h2>
+<p>¿Seguro que deseas eliminar el embarque <strong>{{ object }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+    <a href="{% url 'embarque_list' %}">Cancelar</a>
+</form>
+{% endblock %}
