@@ -32,8 +32,10 @@ AUTH_USER_MODEL = 'usuarios.CustomUser'
 
 INSTALLED_APPS = [
     'apps.contenedor',
-    'apps.usuarios',
     'apps.embarque',
+    'apps.pages',
+    'formtools',
+    'apps.usuarios',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -124,3 +126,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_REDIRECT_URL = "dashboard:panel"
+LOGOUT_REDIRECT_URL = "home"
+# settings.py
+MEDIA_URL  = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+LOGIN_URL = "usuarios:login_origen"  # URL de inicio de sesión para agentes aduanales de origen

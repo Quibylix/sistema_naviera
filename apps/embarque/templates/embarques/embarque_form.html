@@ -1,0 +1,55 @@
+{# templates/embarques/embarque_form.html #}
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>
+    {% if form.instance.pk %}Editar Embarque{% else %}Crear Embarque{% endif %}
+  </title>
+</head>
+<body>
+  <h1>
+    {% if form.instance.pk %}Editar Embarque{% else %}Crear Embarque{% endif %}
+  </h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {# ---------- 1. Campos de Embarque ---------- #}
+    <fieldset>
+      <legend>Datos de Embarque</legend>
+      {{ form.as_p }}
+    </fieldset>
+
+    {# ---------- 2. Campos del Manifiesto inline ---------- #}
+    <fieldset>
+      <legend>Manifiesto de Carga (PDF)</legend>
+
+      {{ formset_manifiesto.management_form }}
+
+      {% for subform in formset_manifiesto.forms %}
+        {{ subform.as_p }}
+
+        {# Si ya existía un manifiesto, podemos mostrar enlace al PDF anterior #}
+        {% if subform.instance and subform.instance.archivo %}
+          <p>Archivo actual:
+            <a href="{{ subform.instance.archivo.url }}" target="_blank">
+              {{ subform.instance.archivo.name|slice:"10:" }}
+            </a>
+          </p>
+        {% endif %}
+      {% endfor %}
+
+      {# Nota: aquí no mostramos nada para eliminar porque can_delete=False #}
+    </fieldset>
+
+    <button type="submit">
+      {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %}
+    </button>
+  </form>
+</body>
+</html>
+{% endblock %}

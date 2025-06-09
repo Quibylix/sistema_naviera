@@ -1,20 +1,22 @@
+# apps/usuarios/models.py
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from apps.embarque.models import Puerto,Pais
 
 class CustomUser(AbstractUser):
-    ROLE_CLIENT  = "Agente aduanal de origen"
-    ROLE_RECEPT  = "Agente aduanal de destino"
+    ROLE_ORIGEN  = "Agente aduanal de origen"
+    ROLE_DESTINO = "Agente aduanal de destino"
 
     ROLE_CHOICES = [
-        (ROLE_CLIENT,  "Agente aduanal de origen"),
-        (ROLE_RECEPT,  "Agente aduanal de destino"),
+        (ROLE_ORIGEN,  "Agente aduanal de origen"),
+        (ROLE_DESTINO,  "Agente aduanal de destino"),
     ]
 
     role = models.CharField(max_length=30, choices=ROLE_CHOICES)
 
-    pais= models.ForeignKey(
-        Pais,
+    # En lugar de importar apps.embarque.models, referimos con strings:
+    pais = models.ForeignKey(
+        "embarque.Pais",            # nombre del app y del modelo separados por punto
         on_delete=models.PROTECT,
         related_name="pais",
         null=True,
@@ -22,15 +24,17 @@ class CustomUser(AbstractUser):
     )
 
     puerto = models.ForeignKey(
-        Puerto,
+        "embarque.Puerto",          # igual, usamos la cadena "embarque.Puerto"
         on_delete=models.PROTECT,
         related_name="puerto",
         null=True,
         blank=True,
     )
 
-    # atajos legibles
     @property
-    def is_client(self):        return self.role == self.ROLE_CLIENT
+    def is_origen(self):
+        return self.role == self.ROLE_ORIGEN
+
     @property
-    def is_receptionist(self):  return self.role == self.ROLE_RECEPT
+    def is_destino(self):
+        return self.role == self.ROLE_DESTINO

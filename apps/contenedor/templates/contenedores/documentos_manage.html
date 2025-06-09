@@ -1,0 +1,304 @@
+{# templates/contenedores/documentos_manage.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <h2>Documentación del contenedor {{ contenedor.pk }}</h2>
+
+
+  {# ------------------------------------------------ #}
+  {#        1) BILL OF LADING (tipo_documento=1)      #}
+  {# ------------------------------------------------ #}
+  <section>
+    <h3>1. Bill of Lading</h3>
+
+    {% if docs_bol %}
+      {# Ya existe uno: muestro nombre + enlace al archivo, y botones Editar/Borrar #}
+      <table>
+        <tr>
+          <th>Nombre</th>
+          <th>Archivo</th>
+          <th>Acciones</th>
+        </tr>
+        <tr>
+          <td>{{ docs_bol.nombre_archivo }}</td>
+          <td>
+            <a href="{{ docs_bol.archivo.url }}" target="_blank">
+              {{ docs_bol.archivo.name }}
+            </a>
+          </td>
+          <td>
+            <a
+              href="{% url 'documento_update' docs_bol.pk %}"
+              class="btn btn-edit"
+            >Editar</a>
+            &nbsp;
+            <a
+              href="{% url 'documento_delete' docs_bol.pk %}"
+              class="btn btn-delete"
+            >Eliminar</a>
+          </td>
+        </tr>
+      </table>
+    {% else %}
+      {# No existe aún: muestro el formulario para crear el Bill of Lading #}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {# OJO: “prefix” y “tipo_pk” son obligatorios para que el view sepa qué formulario es #}
+        <input type="hidden" name="prefix"  value="bol">
+        <input type="hidden" name="tipo_pk" value="1">
+
+        <div class="field-row">
+          {{ bol_form.nombre_archivo.label_tag }}
+          {{ bol_form.nombre_archivo }}
+          {% if bol_form.nombre_archivo.errors %}
+            <div class="error">{{ bol_form.nombre_archivo.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field-row">
+          {{ bol_form.archivo.label_tag }}
+          {{ bol_form.archivo }}
+          {% if bol_form.archivo.errors %}
+            <div class="error">{{ bol_form.archivo.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field-row">
+          {{ bol_form.descripcion_doc.label_tag }}
+          {{ bol_form.descripcion_doc }}
+          {% if bol_form.descripcion_doc.errors %}
+            <div class="error">{{ bol_form.descripcion_doc.errors }}</div>
+          {% endif %}
+        </div>
+
+        {# Si tu formulario incluye “tipo_documento” como HiddenInput, no hace falta mostrarlo. #}
+        {{ bol_form.tipo_documento }}
+
+        <button type="submit" class="btn btn-save">Guardar Bill of Lading</button>
+      </form>
+    {% endif %}
+  </section>
+
+  <hr>
+
+  {# ------------------------------------------------ #}
+  {#       2) FACTURA DE EXPORTACIÓN (tipo_documento=2) #}
+  {# ------------------------------------------------ #}
+  <section>
+    <h3>2. Factura de Exportación</h3>
+
+    
+    {% if consolidado or docs_fac|length == 0 %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="prefix"  value="fac">
+        <input type="hidden" name="tipo_pk" value="2">
+
+        <div class="field-row">
+          {{ fac_form.nombre_archivo.label_tag }}
+          {{ fac_form.nombre_archivo }}
+          {% if fac_form.nombre_archivo.errors %}
+            <div class="error">{{ fac_form.nombre_archivo.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field-row">
+          {{ fac_form.archivo.label_tag }}
+          {{ fac_form.archivo }}
+          {% if fac_form.archivo.errors %}
+            <div class="error">{{ fac_form.archivo.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field-row">
+          {{ fac_form.descripcion_doc.label_tag }}
+          {{ fac_form.descripcion_doc }}
+          {% if fac_form.descripcion_doc.errors %}
+            <div class="error">{{ fac_form.descripcion_doc.errors }}</div>
+          {% endif %}
+        </div>
+
+        {{ fac_form.tipo_documento }}  {# habitualmente viene como HiddenInput #}
+
+        <button type="submit" class="btn btn-{% if consolidado %}new{% else %}save{% endif %}">
+          {% if consolidado %}Guardar{% else %}Guardar Factura{% endif %}
+        </button>
+      </form>
+    {% endif %}
+  </section>
+
+  <hr>
+
+  {# ------------------------------------------------ #}
+  {#       3) CERTIFICADO DE ORIGEN (tipo_documento=3)  #}
+  {# ------------------------------------------------ #}
+  <section>
+    <h3>3. Certificado de Origen</h3>
+
+    {% if docs_cert %}
+      <table>
+        <tr>
+          <th>Nombre</th>
+          <th>Archivo</th>
+          <th>Acciones</th>
+        </tr>
+        <tr>
+          <td>{{ docs_cert.nombre_archivo }}</td>
+          <td>
+            <a href="{{ docs_cert.archivo.url }}" target="_blank">
+              {{ docs_cert.archivo.name }}
+            </a>
+          </td>
+          <td>
+            <a
+              href="{% url 'documento_update' docs_cert.pk %}"
+              class="btn btn-edit"
+            >Editar</a>
+            &nbsp;
+            <a
+              href="{% url 'documento_delete' docs_cert.pk %}"
+              class="btn btn-delete"
+            >Eliminar</a>
+          </td>
+        </tr>
+      </table>
+    {% else %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="prefix"  value="cert">
+        <input type="hidden" name="tipo_pk" value="3">
+
+        <div class="field-row">
+          {{ cert_form.nombre_archivo.label_tag }}
+          {{ cert_form.nombre_archivo }}
+          {% if cert_form.nombre_archivo.errors %}
+            <div class="error">{{ cert_form.nombre_archivo.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field-row">
+          {{ cert_form.archivo.label_tag }}
+          {{ cert_form.archivo }}
+          {% if cert_form.archivo.errors %}
+            <div class="error">{{ cert_form.archivo.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field-row">
+          {{ cert_form.descripcion_doc.label_tag }}
+          {{ cert_form.descripcion_doc }}
+          {% if cert_form.descripcion_doc.errors %}
+            <div class="error">{{ cert_form.descripcion_doc.errors }}</div>
+          {% endif %}
+        </div>
+
+        {{ cert_form.tipo_documento }}
+
+        <button type="submit" class="btn btn-save">Guardar Certificado</button>
+      </form>
+    {% endif %}
+  </section>
+
+  <hr>
+
+  {# ------------------------------------------------ #}
+  {#        4) DOCUMENTOS DE SOPORTE (tipo_documento=4)  #}
+  {# ------------------------------------------------ #}
+  <section>
+  <h3>4. Documentos de Soporte</h3>
+
+  {# Formulario para crear “Soporte” siempre visible #}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="prefix"  value="supp">
+    <input type="hidden" name="tipo_pk" value="4">
+
+    <div class="field-row">
+      {{ supp_form.tipo_soporte.label_tag }}
+      {{ supp_form.tipo_soporte }}
+      {% if supp_form.tipo_soporte.errors %}
+        <div class="error">{{ supp_form.tipo_soporte.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="field-row">
+      {{ supp_form.nombre_archivo.label_tag }}
+      {{ supp_form.nombre_archivo }}
+      {% if supp_form.nombre_archivo.errors %}
+        <div class="error">{{ supp_form.nombre_archivo.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="field-row">
+      {{ supp_form.archivo.label_tag }}
+      {{ supp_form.archivo }}
+      {% if supp_form.archivo.errors %}
+        <div class="error">{{ supp_form.archivo.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="field-row">
+      {{ supp_form.descripcion_doc.label_tag }}
+      {{ supp_form.descripcion_doc }}
+      {% if supp_form.descripcion_doc.errors %}
+        <div class="error">{{ supp_form.descripcion_doc.errors }}</div>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-new">Guardar</button>
+  </form>
+
+  
+
+  {# ------------------------------------------------ #}
+  {#         5) RESUMEN GLOBAL DE TODOS LOS DOCUMENTOS   #}
+  {# ------------------------------------------------ #}
+  <h3>Resumen global</h3>
+  <table>
+    <tr>
+      <th>Tipo</th>
+      <th>Nombre</th>
+      <th>Archivo</th>
+      <th>Descripción</th>
+      <th>Acciones</th>
+    </tr>
+    {% for d in docs_all %}
+      <tr>
+        <td>{{ d.tipo_documento }}</td>
+        <td>{{ d.nombre_archivo }}</td>
+        <td>
+          <a href="{{ d.archivo.url }}" target="_blank">
+            {{ d.archivo.name }}
+          </a>
+        </td>
+        <td>{{ d.descripcion_doc|default:"—" }}</td>
+        <td>
+          <a
+            href="{% url 'documento_update' d.pk %}"
+            class="btn btn-edit"
+          >Editar</a>
+          &nbsp;
+          <a
+            href="{% url 'documento_delete' d.pk %}"
+            class="btn btn-delete"
+          >Eliminar</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5" style="text-align:center;">Aún no hay documentos.</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <p>
+  <a href="{% url 'embarque_list' %}">⇦ Volver al listado de embarques</a>
+  {% if doc_bol and docs_fac|length > 0 and doc_cert %}
+    <a href="{% url 'embarque_detail' contenedor.embarque.pk %}" class="btn btn-primary">Siguiente</a>
+  {% else %}
+    <a href="#" class="btn btn-primary disabled" style="pointer-events:none;opacity:0.5;">Siguiente</a>
+    <span style="color:red;"> Debes subir Bill of Lading, Factura de Exportación y Certificado de Origen.</span>
+  {% endif %}
+</p>
+{% endblock %}

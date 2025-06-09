@@ -1,0 +1,37 @@
+{# templates/base.html #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Portails{% endblock %}</title>
+  {# Aquí incluyes tus CSS, JS, Bootstrap, etc. #}
+</head>
+<body>
+  <header>
+    <nav>
+        {% if user.is_authenticated  %}
+            <span>Hola, {{ user.username }} </span> |
+            <form action="{% url 'usuarios:logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" style="background:none;border:none;color:#00f;cursor:pointer;">Cerrar sesión</button>
+            </form>
+               <a href="{% url 'embarque_list' %}" class="btn btn-primary">Consultar</a>
+        {% else %}
+            <a href="{% url 'pages:home' %}">Home</a>
+        {% endif %}
+    </nav>
+  </header>
+
+  <hr>
+
+  <div class="container">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <hr>
+  <footer style="text-align:center; padding:10px 0;">
+    © 2025 SGCD-Portails. Todos los derechos reservados.
+  </footer>
+</body>
+</html>

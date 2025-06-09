@@ -1,0 +1,15 @@
+<!-- templates/contenedores/contenedor_form.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Crear contenedor para embarque {{ embarque.id_embarque }}</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <button class="btn btn-primary">Guardar</button>
+ <p><strong>Puerto origen:</strong> {{ embarque.puerto_procedencia }}</p>
+
+  <a class="btn btn-secondary" href="{% url 'embarque_list' %}">Cancelar</a>
+</form>
+{% endblock %}

@@ -3,7 +3,7 @@ from .models import Contenedor, TipoContenedor, Bulto, Mercancia, TipoCarga,Docu
 
 @admin.register(Contenedor)
 class ContenedorAdmin(admin.ModelAdmin):
-    list_display = ("id_contenedor", "tipo_contenedor", "tipo_carga", "puerto_procedencia", "puerto_descarga", "embarque", "es_consolidado")
+    list_display = ("id_contenedor", "tipo_contenedor", "tipo_carga", "puerto_procedencia", "puerto_descarga", "embarque", "es_consolidado", "estado_contenedor")
     list_filter = ("tipo_contenedor", "tipo_carga", "puerto_procedencia", "puerto_descarga", "embarque")
     search_fields = ("id_contenedor",)
 

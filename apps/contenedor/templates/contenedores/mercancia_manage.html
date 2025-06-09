@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Mercancías del contenedor {{ contenedor.pk }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <table>
+      <tr><th>Descripción</th><td>{{ form.descripcion_mercancia }}</td></tr>
+      <tr><th>Cantidad de bultos</th><td>{{ form.cantidad_bultos }}</td></tr>
+      <tr><th>Clase de bultos</th><td>{{ form.bulto }}</td></tr>
+      <tr><th>País de origen</th><td>{{ form.pais }}</td></tr>
+    </table>
+    <button type="submit">Agregar Mercancía</button>
+
+    {# Aquí comprobamos si hay al menos una mercancía #}
+    {% if mercancias %}
+      <a class="btn btn-primary" href="{% url 'documentos_manage' contenedor.pk %}">
+        Siguiente ➜
+      </a>
+    {% else %}
+      <button class="btn btn-secondary" disabled title="Agrega al menos una mercancía">
+        Siguiente ➜
+      </button>
+      <p class="text-danger mt-2">Debes añadir al menos una mercancía antes de continuar.</p>
+    {% endif %}
+  </form>
+
+  <hr>
+
+  <h3>Listado actual</h3>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <th>Mercancía ID</th><th>Descripción</th><th>Cant. bultos</th>
+      <th>Clase bulto</th><th>País origen</th><th>Peso bruto (kg)</th><th>Acciones</th>
+    </tr>
+    {% for m in mercancias %}
+      <tr>
+        <td>{{ m.id_mercancia }}</td>
+        <td>{{ m.descripcion_mercancia|truncatechars:40 }}</td>
+        <td>{{ m.cantidad_bultos }}</td>
+        <td>{{ m.bulto }}</td>
+        <td>{{ m.pais }}</td>
+        <td>{{ m.peso_bruto|default:"—" }}</td>
+        <td>
+          {% if user.is_origen and m.contenedor.embarque.estado == 'borrador' %}
+            <a href="{% url 'mercancia_edit' m.pk %}">Editar</a>
+            <a href="{% url 'mercancia_delete' m.pk %}">Eliminar</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7">Aún no hay mercancías.</td></tr>
+    {% endfor %}
+  </table>
+{% endblock %}
