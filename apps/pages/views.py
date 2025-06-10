@@ -18,8 +18,6 @@ def panel(request):
         return render(request, "panel_destino.html")
     return redirect("pages:home")
 
-
-def mi_404_personalizado(request, exception):
-    # Puedes pasarle un contexto si quieres
+def custom_404(request, exception):
     return render(request, '404.html', status=404)
 

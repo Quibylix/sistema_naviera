@@ -31,7 +31,6 @@ class SegmentoRutaAdmin(admin.ModelAdmin):
     list_filter = ("ruta", "puerto")
     search_fields = ("ruta__nombre_ruta", "puerto__nombre_puerto")
     ordering = ("ruta", "orden_ruta")
-    autocomplete_fields = ["puerto"]
 
 @admin.register(Buque)
 class BuqueAdmin(admin.ModelAdmin):
@@ -41,7 +40,7 @@ class BuqueAdmin(admin.ModelAdmin):
 
 @admin.register(Embarque)
 class EmbarqueAdmin(admin.ModelAdmin):
-    list_display = ("id_embarque", "ruta", "puerto_destino", "puerto_procedencia", "pais_destino", "pais_procedencia")
+    list_display = ("id_embarque", "ruta", "puerto_destino", "puerto_procedencia", "puerto_actual", "pais_destino", "pais_procedencia")
     list_filter = ("ruta", "puerto_destino", "puerto_procedencia", "pais_destino", "pais_procedencia")
     search_fields = ("id_embarque",)
 

@@ -3,7 +3,6 @@ from django.db import models,transaction
 from django.db.models import Max, IntegerField
 from django.db.models.functions import Cast, Substr
 from django.core.exceptions import ValidationError
-
 from apps.usuarios.models import CustomUser
 
 class Pais(models.Model):
@@ -75,7 +74,7 @@ class Ruta(models.Model):
 
 class SegmentoRuta(models.Model):
     puerto = models.ForeignKey(
-        Puerto, on_delete=models.PROTECT, related_name="segmentos"
+        Puerto, on_delete=models.CASCADE, related_name="segmentos"
     )
     ruta = models.ForeignKey(
         Ruta, on_delete=models.CASCADE, related_name="segmentos"
@@ -109,11 +108,18 @@ class Embarque(models.Model):
         related_name="embarques"
     )
 
-    # Referencias geográficas (sólo lectura en formularios)
     puerto_destino     = models.ForeignKey(
         "Puerto",
         on_delete=models.PROTECT,
         related_name="embarques_destino",
+        null=True,
+        blank=True,
+        editable=False
+    )
+    puerto_actual      = models.ForeignKey(
+        "Puerto",
+        on_delete=models.PROTECT,
+        related_name="embarques_actual",
         null=True,
         blank=True,
         editable=False
@@ -189,6 +195,54 @@ class Embarque(models.Model):
         null=False,
         blank=False,
     )
+    orden_actual = models.PositiveIntegerField(
+        default=0,
+        help_text="0 = aún no ha zarpado; 1 = salió del 1er puerto, etc."
+    )
+
+    def orden_de_puerto(self, puerto):
+        """
+        Devuelve el número de orden (1,2,3,…) de `puerto`
+        dentro de la ruta, o None si no pertenece a ella.
+        """
+        return (
+            self.ruta.segmentos     # relación Reverse FK
+                .filter(puerto=puerto)
+                .values_list('orden_ruta', flat=True)
+                .first()
+        )
+
+    def puerto_ya_pasado(self, puerto):
+        """
+        True  → el buque ya zarpó de ese puerto (o está más adelante).
+        False → el buque aún no llegó o está en ese puerto.
+        """
+        orden = self.orden_de_puerto(puerto)
+        return orden is not None and orden <= self.orden_actual
+
+    @property
+    def puertos_transitados(self):
+        """
+        Devuelve una tupla (transitados, total) según el orden de la ruta y el puerto_actual.
+        Si no ha zarpado, transitados=0.
+        """
+        if not self.ruta:
+            return (0, 0)
+        segmentos = list(self.ruta.segmentos.order_by("orden_ruta"))
+        total = len(segmentos)
+        if not self.puerto_actual:
+            return (0, total)
+        # Busca el índice del puerto_actual en la ruta
+        transitados = 0
+        for seg in segmentos:
+            transitados += 1
+            if seg.puerto == self.puerto_actual:
+                break
+        else:
+            # Si el puerto_actual no está en la ruta, considera 0 transitados
+            transitados = 0
+        return (transitados, total)
+        
     def tiene_mercancias(self) -> bool:
         
         return self.contenedores.filter(mercancias__isnull=False).exists()
@@ -269,6 +323,22 @@ class Embarque(models.Model):
 
         super().save(*args, **kwargs)
 
+    def actualizar_puerto_actual(self):
+        """
+        Si algún contenedor está ARRIBADO o REVOCADO, el puerto_actual es el puerto_descarga de ese contenedor.
+        Si hay varios, toma el último.
+        Si ninguno, deja en None (Sin zarpar).
+        """
+        from apps.contenedor.models import Contenedor
+        arribados_o_revocados = self.contenedores.filter(
+            estado_contenedor__in=[Contenedor.ARRIBADO, Contenedor.REVOCADO]
+        )
+        if arribados_o_revocados.exists():
+            self.puerto_actual = arribados_o_revocados.last().puerto_descarga
+        else:
+            self.puerto_actual = None
+        self.save(update_fields=["puerto_actual"])
+
 class ManifiestoCarga(models.Model):
     id_mc = models.AutoField(primary_key=True)
     doc_mc = models.FileField(upload_to="manifiestos/", null=False  , blank=False)
@@ -288,8 +358,17 @@ class ManifiestoCarga(models.Model):
         default=DENEGADO,
         help_text="Estado del manifiesto de carga"
     )
-
+    validado_por = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="manifiestos_validacion",
+        null=True,
+        blank=True,
+        help_text="Usuario que validó el manifiesto"
+    )
     
+    
+
 
 class Escala(models.Model):
     puerto = models.ForeignKey(Puerto, on_delete=models.PROTECT, related_name="escalas")
@@ -335,5 +414,4 @@ class Escala(models.Model):
         # Llama a clean() para garantizar la sincronía
         self.clean()
         super().save(*args, **kwargs)
-
 

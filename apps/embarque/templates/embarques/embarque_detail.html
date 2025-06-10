@@ -5,82 +5,67 @@
 {% block content %}
 <h2>Detalle del Embarque {{ embarque.id_embarque }}</h2>
 
-<!-- ======================================================= -->
-<!-- 1) INFORMACIÓN GENERAL DEL EMBARQUE (solo lectura)      -->
-<!-- ======================================================= -->
+{# ──────────────────────────────────────────────────────────── #}
+{# 1  INFORMACIÓN GENERAL                                     #}
+{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Información del embarque</h3>
   <div style="display:flex; flex-wrap:wrap; gap:1rem;">
-    <div>
-      <label><strong>Número de Embarque (ID):</strong></label><br>
-      <span>{{ embarque.id_embarque }}</span>
+    <div><strong>ID:</strong><br>{{ embarque.id_embarque }}</div>
+    <div><strong>Ruta:</strong><br>{{ embarque.ruta.nombre_ruta }}</div>
+    <div><strong>F. salida:</strong><br>{{ embarque.fecha_salida|date:"d/m/Y" }}</div>
+    <div><strong>Buque:</strong><br>{{ embarque.buque.nombre_buque }}</div>
+    <div><strong>Transportista:</strong><br>{{ embarque.nombre_transportista }}</div>
+    <div><strong>Pto. origen:</strong><br>{{ embarque.puerto_procedencia.nombre_puerto }}</div>
+    <div><strong>País origen:</strong><br>{{ embarque.pais_procedencia.nombre_pais }}</div>
+    <div><strong>Pto. destino:</strong><br>{{ embarque.puerto_destino.nombre_puerto }}</div>
+    <div><strong>País destino:</strong><br>{{ embarque.pais_destino.nombre_pais }}</div>
+    <div><strong>Pto. actual:</strong><br>
+      {% if embarque.puerto_actual %}
+        {{ embarque.puerto_actual.nombre_puerto }}
+      {% else %}
+        {{ embarque.puerto_procedencia.nombre_puerto }}
+      {% endif %}
     </div>
-    <div>
-      <label><strong>Ruta:</strong></label><br>
-      <span>{{ embarque.ruta.nombre_ruta }}</span>
-    </div>
-    <div>
-      <label><strong>Fecha de salida:</strong></label><br>
-      <span>{{ embarque.fecha_salida|date:"d/m/Y" }}</span>
-    </div>
-    <div>
-      <label><strong>Buque:</strong></label><br>
-      <span>{{ embarque.buque.nombre_buque }}</span>
-    </div>
-    <div>
-      <label><strong>Nombre transportista:</strong></label><br>
-      <span>{{ embarque.nombre_transportista }}</span>
-    </div>
-    <div>
-      <label><strong>Puerto de procedencia:</strong></label><br>
-      <span>{{ embarque.puerto_procedencia.nombre_puerto }}</span>
-    </div>
-    <div>
-      <label><strong>País de procedencia:</strong></label><br>
-      <span>{{ embarque.pais_procedencia.nombre_pais }}</span>
-    </div>
-
-    <div>
-      <label><strong>Puerto de destino:</strong></label><br>
-      <span>{{ embarque.puerto_destino.nombre_puerto }}</span>
-    </div>
-    <div>
-      <label><strong>País de destino:</strong></label><br>
-      <span>{{ embarque.pais_destino.nombre_pais }}</span>
-    </div>
-    <div>
-      <label><strong>Manifiesto de carga</strong></label><br>
-      <span>
-        {% if embarque.manifiesto_carga %}
-          <a href="{{ embarque.manifiesto_carga.doc_mc.url }}" target="_blank">
-            Ver Manifiesto
-          </a>
+    <div><strong>Estado:</strong><br>
+      {% if embarque.puerto_actual %}
+        {% if embarque.puerto_actual.pk == embarque.puerto_procedencia.pk %}
+          Sin zarpar
+        {% elif embarque.puerto_actual.pk == embarque.puerto_destino.pk %}
+          Finalizado
         {% else %}
-          No disponible
-        {% endif %} 
-      </span>
+          En tránsito
+        {% endif %}
+      {% else %}
+        Sin zarpar
+      {% endif %}
+    </div>
+    <div>
+      <strong>Puertos transitados:</strong>
+      {{ embarque.puertos_transitados.0 }} / {{ embarque.puertos_transitados.1 }}
+    </div>
+    <div><strong>Manifiesto de carga:</strong><br>
+      {% if embarque.manifiesto_carga %}
+        <a href="{{ embarque.manifiesto_carga.doc_mc.url }}" target="_blank">Ver Manifiesto</a>
+      {% else %}
+        No disponible
+      {% endif %}
+    </div>
   </div>
 </section>
 
-<!-- ======================================================= -->
-<!-- 2) TABLA DE CONTENEDORES ASOCIADOS                       -->
-<!-- ======================================================= -->
+{# ──────────────────────────────────────────────────────────── #}
+{# 2  CONTENEDORES                                            #}
+{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Contenedores asociados</h3>
-  <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;" border="1" cellpadding="4">
+  <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
     <thead>
       <tr style="background:#f0f0f0;">
-        <th>N°</th>
-        <th>ID Contenedor</th>
-        <th>Tipo de Carga</th>
-        <th>Puerto origen</th>
-        <th>Puerto destino</th>
-        <th>Fecha salida</th>
-        <th>Fecha llegada</th>
-        <th>Estado</th>
-        {% if user.is_origen and embarque.estado == 'borrador' %}
-          <th>Acciones</th>
-        {% endif %}
+        <th>#</th><th>ID Contenedor</th><th>Tipo carga</th>
+        <th>Pto. origen</th><th>Pto. destino</th>
+        <th>F. salida</th><th>F. llegada</th><th>Estado</th>
+        {% if user.is_origen and embarque.estado == 'borrador' %}<th>Acciones</th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -91,41 +76,32 @@
         <td>{{ cont.tipo_carga }}</td>
         <td>{{ cont.puerto_procedencia }}</td>
         <td>{{ cont.puerto_descarga }}</td>
-        <td>{{ cont.fecha_salida }}</td>
-        <td>
-          {% if cont.fecha_llegada %}
-            {{ cont.fecha_llegada|date:"d/m/Y" }}
-          {% else %}
-            –
-          {% endif %}
-        </td>
+        <td>{{ cont.fecha_salida|date:"d/m/Y" }}</td>
+        <td>{% if cont.fecha_llegada %}{{ cont.fecha_llegada|date:"d/m/Y" }}{% else %}–{% endif %}</td>
         <td>{{ cont.estado_contenedor }}</td>
         {% if user.is_origen and embarque.estado == 'borrador' %}
           <td>
-            <a href="{% url 'contenedor_edit' cont.pk %}">Editar</a>
+            <a href="{% url 'contenedor_edit' cont.pk %}">Editar</a> |
             <a href="{% url 'contenedor_delete' cont.pk %}">Eliminar</a>
           </td>
         {% endif %}
       </tr>
       {% empty %}
-      <tr>
-        <td colspan="9" style="text-align:center;">No hay contenedores asignados.</td>
-      </tr>
+      <tr><td colspan="9" style="text-align:center;">No hay contenedores asignados.</td></tr>
       {% endfor %}
-
     </tbody>
   </table>
 </section>
 
-<!-- ======================================================= -->
-<!-- 3) MERCANCÍA POR CADA CONTENEDOR                         -->
-<!-- ======================================================= -->
+{# ──────────────────────────────────────────────────────────── #}
+{# 3 ▸ MERCANCÍA                                               #}
+{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Mercancía</h3>
-  <table border="1" cellpadding="4" style="width:100%; border-collapse:collapse;">
+  <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
     <thead>
       <tr style="background:#f0f0f0;">
-        <th>N°</th><th>ID Contenedor</th><th>Mercancía</th><th>Descripción</th>
+        <th>#</th><th>ID Contenedor</th><th>Mercancía</th><th>Descripción</th>
         <th>Cant. bultos</th><th>Clase bultos</th><th>País origen</th><th>Peso bruto</th>
       </tr>
     </thead>
@@ -133,95 +109,137 @@
       {% for cont in contenedores_visibles %}
         {% if cont.mercancias.exists %}
           {% for m in cont.mercancias.all %}
-            <tr>
-              <td>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-              <td>{{ cont.id_contenedor }}</td>
-              <td>{{ m.descripcion_mercancia }}</td>
-              <td>{{ m.descripcion_mercancia }}</td>
-              <td>{{ m.cantidad_bultos }}</td>
-              <td>{{ m.bulto }}</td>
-              <td>{{ m.pais }}</td>
-              <td>{{ m.peso_bruto }}</td>
-            </tr>
+          <tr>
+            <td>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
+            <td>{{ cont.id_contenedor }}</td>
+            <td>{{ m.descripcion_mercancia }}</td>
+            <td>{{ m.descripcion_mercancia }}</td>
+            <td>{{ m.cantidad_bultos }}</td>
+            <td>{{ m.bulto }}</td>
+            <td>{{ m.pais }}</td>
+            <td>{{ m.peso_bruto }}</td>
+          </tr>
           {% endfor %}
         {% else %}
           <tr>
             <td colspan="8" style="text-align:center;">
-              El contenedor {{ cont.id_contenedor }} no tiene mercancías registradas.
+              El contenedor {{ cont.id_contenedor }} no tiene mercancías.
             </td>
           </tr>
         {% endif %}
       {% empty %}
-        <tr><td colspan="8" style="text-align:center;">No hay mercancia.</td></tr>
+        <tr><td colspan="8" style="text-align:center;">No hay mercancía.</td></tr>
       {% endfor %}
     </tbody>
   </table>
 </section>
 
-<!-- ======================================================= -->
-<!-- 4) DOCUMENTACIÓN POR CADA CONTENEDOR                    -->
-<!-- ======================================================= -->
+{# ──────────────────────────────────────────────────────────── #}
+{# 4 ▸ DOCUMENTACIÓN                                           #}
+{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Documentación</h3>
-  <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;" border="1" cellpadding="4">
+  <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
     <thead>
       <tr style="background:#f0f0f0;">
-        <th>N°</th>
-        <th>ID Contenedor</th>
-        <th>Tipo de Doc.</th>
-        <th>Archivo</th>
-        <th>Descripción</th>
-        <th>Estado</th>
-        {% if user.is_destino %}
-          <th>Acciones</th>
-        {% else %}
+        <th>#</th><th>ID Contenedor</th><th>Tipo doc.</th><th>Archivo</th>
+        <th>Descripción</th><th>Estado</th>
+        {% if user.is_destino %}<th>Acciones</th>{% endif %}
         <th>Comentario</th>
-        {% endif %}
       </tr>
     </thead>
     <tbody>
+
+      {# 4.1 ▸ Manifiesto de carga (fila 0) #}
+      {% if user.is_destino and embarque.manifiesto_carga %}
+      <tr style="background:#eef;">
+        <td>0</td>
+        <td>—</td>
+        <td>Manifiesto de carga</td>
+        <td><a href="{{ embarque.manifiesto_carga.doc_mc.url }}" target="_blank">{{ embarque.manifiesto_carga.nombre_mc }}</a></td>
+        <td>{{ embarque.manifiesto_carga.nombre_mc }}</td>
+        <td>{{ embarque.manifiesto_carga.estado_mc }}</td>
+
+        {% if user.is_destino %}
+        <td>
+          {% if embarque.manifiesto_carga.estado_mc != 'Aprobado' %}
+          <form action="{% url 'manifiesto_validar' embarque.manifiesto_carga.pk %}" method="post" style="display:inline;">
+            {% csrf_token %}<input type="hidden" name="accion" value="aprobar">
+            <button>Validar</button>
+          </form>
+          {% endif %}
+          {% if embarque.manifiesto_carga.estado_mc != 'Denegado' %}
+          <form action="{% url 'manifiesto_validar' embarque.manifiesto_carga.pk %}" method="post" style="display:inline;">
+            {% csrf_token %}<input type="hidden" name="accion" value="denegar">
+            <button>Rechazar</button>
+          </form>
+          {% endif %}
+        </td>
+        {% endif %}
+        <td>—</td>
+      </tr>
+      {% endif %}
+
+      {# 4.2 ▸ Documentos por contenedor #}
       {% for cont in contenedores_visibles %}
         {% for doc in cont.documentos.all %}
-          <tr>
-            <td>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-            <td>{{ cont.id_contenedor }}</td>
-            <td>{{ doc.tipo_documento.nombre_tipo_doc }}</td>
-            <td>
-              {% if doc.archivo %}
-                <a href="{{ doc.archivo.url }}" target="_blank">{{ doc.nombre_archivo }}</a>
-              {% else %}—{% endif %}
-            </td>
-            <td>{{ doc.descripcion_doc }}</td>
-            <td>{{ doc.get_estado_doc_display }}</td>
-            {% if user.is_destino and cont.puerto_descarga == user.puerto %}
-              <td>
-                {% if doc.estado_doc == 0 %}
-                  <form action="{% url 'documento_validar' doc.pk %}" method="post" style="display:inline;">
-                    {% csrf_token %}<input type="hidden" name="accion" value="aprobar">
-                    <button title="Validar">Validar</button>
-                  </form>
-                  <form action="{% url 'documento_validar' doc.pk %}" method="post" style="display:inline;">
-                    {% csrf_token %}<input type="hidden" name="accion" value="rechazar">
-                    <button title="Rechazar">Rechazar</button>
-                    <input type="text" name="comentario" size="8" placeholder="Motivo" required>
-                  </form>
-                {% endif %}
-              </td>
-            {% elif user.is_destino %}
-              <td></td>
-            {% endif %}
+        <tr>
+          <td>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
+          <td>{{ cont.id_contenedor }}</td>
+          <td>{{ doc.tipo_documento.nombre_tipo_doc }}</td>
+          <td>
+            {% if doc.archivo %}
+              <a href="{{ doc.archivo.url }}" target="_blank">{{ doc.nombre_archivo }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td>{{ doc.descripcion_doc }}</td>
+          <td>{{ doc.get_estado_doc_display }}</td>
 
-            <td>{{ doc.comentario }}</td>
-          </tr>
+          {% if user.is_destino and cont.puerto_descarga == user.puerto %}
+          <td>
+            {% if doc.estado_doc != 1 %}
+              <form action="{% url 'documento_validar' doc.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}<input type="hidden" name="accion" value="aprobar">
+                <button>Validar</button>
+              </form>
+            {% endif %}
+            {% if doc.estado_doc != 2 %}
+              <button form="rech-{{doc.pk}}">Rechazar</button>
+            {% endif %}
+            {% if doc.estado_doc != 0 %}
+              <form action="{% url 'documento_validar' doc.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}<input type="hidden" name="accion" value="pendiente">
+                <button title="Volver a pendiente">Deshacer</button>
+              </form>
+            {% endif %}
+          </td>
+          {% elif user.is_destino %}
+            <td></td>
+          {% endif %}
+
+          <td>
+            {% if user.is_destino and cont.puerto_descarga == user.puerto and doc.estado_doc == 0 %}
+              <form id="rech-{{doc.pk}}" action="{% url 'documento_validar' doc.pk %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="rechazar">
+                <input type="text" name="comentario" size="15" placeholder="Motivo" required>
+              </form>
+            {% else %}
+              {{ doc.comentario }}
+            {% endif %}
+          </td>
+        </tr>
         {% endfor %}
       {% empty %}
-        <tr><td colspan="8" style="text-align:center;">No hay documentos.</td></tr>
+        <tr>
+          <td colspan="{% if user.is_destino %}8{% else %}7{% endif %}" style="text-align:center;">
+            No hay documentos de contenedores.
+          </td>
+        </tr>
       {% endfor %}
     </tbody>
   </table>
 </section>
 
-<p>
-  <a href="{% url 'embarque_list' %}">← Volver al listado de embarques</a>
-</p>
+<p><a href="{% url 'embarque_list' %}">← Volver al listado de embarques</a></p>
 {% endblock %}

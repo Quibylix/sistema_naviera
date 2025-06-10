@@ -52,5 +52,5 @@ class DestinoLoginView(LoginView):
     def get_success_url(self):
         # A dónde mandamos al agente Destino luego de loguearse:
         # Por ejemplo, al listado de “Contenedores” que debe validar:
-        return reverse_lazy("contenedor_list_destino")
+        return reverse_lazy("embarque_list")
     

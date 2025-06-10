@@ -11,23 +11,62 @@ from django.shortcuts import redirect,get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-class EmbarqueListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+# apps/embarques/views.py
+
+class EmbarqueListView(LoginRequiredMixin, ListView):
+    """
+    • Agente de origen → muestra sus embarques propios.
+    • Agente de destino → muestra los embarques ENVIADOS cuya ruta
+                          contiene su puerto.
+    """
     model               = Embarque
     template_name       = "embarques/embarque_list.html"
     context_object_name = "embarques"
 
-    def test_func(self):
-        # Solo permitimos acceder a esta lista si el usuario es “Agente de origen”
-        return self.request.user.is_authenticated and self.request.user.is_origen
-
-    def handle_no_permission(self):
-        # Si no es agente de origen, redirigimos o mostramos mensaje
-        return redirect("pages:home")  # Cambia “home” por tu vista de inicio
-
     def get_queryset(self):
-        # Filtramos por el agente de origen logueado
-        qs = super().get_queryset()
-        return qs.filter(agente_origen=self.request.user).order_by("-fecha_salida")
+        user = self.request.user
+        qs   = super().get_queryset()
+
+        if getattr(user, "is_origen", False):
+            return qs.filter(agente_origen=user).order_by("-fecha_salida")
+
+        if getattr(user, "is_destino", False):
+            return (
+                qs.filter(
+                    estado=Embarque.EST_ENVIADO,
+                    ruta__puertos=user.puerto      # puerto dentro de la ruta
+                )
+                .order_by("-fecha_salida")
+            )
+
+        # Otros tipos de usuario → lista vacía
+        return qs.none()
+
+def puede_validar(user, embarque):
+    """
+    True si el usuario destino es el siguiente puerto de la ruta
+    y el puerto anterior (si existe) ya quedó completado.
+    """
+    if not (user.is_destino and user.puerto):
+        return False
+
+    orden_user = embarque.orden_de_puerto(user.puerto)
+    if not orden_user:                       # su puerto no en ruta
+        return False
+
+    if orden_user != embarque.orden_actual + 1:
+        return False                         # aún no es su turno
+
+    # si hay puerto anterior, debe estar completado
+    if embarque.orden_actual > 0:
+        puerto_prev = embarque.ruta.puertos.get(
+            segmentos__orden_ruta=embarque.orden_actual
+        )
+        if not embarque.puerto_completado(puerto_prev):
+            return False
+
+    return True
+
 
 class EmbarqueCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model         = Embarque
@@ -65,20 +104,16 @@ class EmbarqueCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return data
 
     def form_valid(self, form):
-        # 1) Asignamos que el agente de origen es el usuario logueado
         form.instance.agente_origen = self.request.user
 
-        # 2) Primero guardamos el Embarque
         self.object = form.save()
 
-        # 3) Procesamos el inline formset de ManifiestoCarga
         context = self.get_context_data()
         formset_manifiesto = context['formset_manifiesto']
         if formset_manifiesto.is_valid():
             formset_manifiesto.instance = self.object
             formset_manifiesto.save()
         else:
-            # Si el manifiesto falla, borramos el embarque recién creado
             self.object.delete()
             return self.form_invalid(form)
 
@@ -141,39 +176,38 @@ class EmbarqueDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "embarques/embarque_confirm_delete.html"
 
 class EmbarqueDetailView(LoginRequiredMixin, DetailView):
-    model = Embarque
-    template_name = "embarques/embarque_detail.html"
-    context_object_name = "embarque"  # → en template: {{ embarque }}
+    model               = Embarque
+    template_name       = "embarques/embarque_detail.html"
+    context_object_name = "embarque"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        embarque = self.object
+        user      = self.request.user
+        embarque  = self.object
 
-        # ─── Filtro según tipo de usuario ───
-        if self.request.user.is_destino:
-            # Contenedores cuyo puerto DESCARGA coincide con el puerto del agente
+        if getattr(user, "is_destino", False):
             conts = embarque.contenedores.filter(
-                puerto_descarga=self.request.user.puerto
-            ).select_related("puerto_descarga")
-        else:  # agente de origen u otros
-            conts = embarque.contenedores.select_related("puerto_descarga")
+                puerto_descarga=user.puerto
+            )
+        else:
+            conts = embarque.contenedores.all()
 
-        ctx["contenedores_visibles"] = conts.prefetch_related(
-            "mercancias__pais",
-            "documentos__tipo_documento",
+        ctx["contenedores_visibles"] = (
+            conts
+            .select_related("puerto_descarga")
+            .prefetch_related("mercancias__pais", "documentos__tipo_documento")
         )
         return ctx
+
 
 @login_required
 @require_POST
 def embarque_enviar(request, pk):
     embarque = get_object_or_404(Embarque, pk=pk)
 
-    # 1) permisos
     if not (request.user.is_origen and embarque.agente_origen == request.user):
         return redirect("pages:home")
 
-    # 2) validaciones de contenido
     if not embarque.tiene_mercancias():
         messages.error(request,
             "Debes agregar al menos una mercancía antes de enviar el embarque.")
@@ -184,30 +218,43 @@ def embarque_enviar(request, pk):
             "Debes adjuntar al menos un documento antes de enviar el embarque.")
         return redirect("embarque_detail", pk=pk)
 
-    # 3) todo ok → cambiar estado
     embarque.estado = Embarque.EST_ENVIADO
     embarque.save(update_fields=["estado"])
     messages.success(request, "¡Embarque enviado correctamente!")
     return redirect("embarque_detail", pk=pk)
 
-class EmbarqueDestinoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    """
-    Lista de embarques que han sido ENVIADOS y cuyo puerto_destino
-    coincide con el del agente aduanal de destino logueado.
-    """
-    model               = Embarque
-    template_name       = "embarques/embarque_list.html"   # reutilizamos
-    context_object_name = "embarques"
 
-    def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.is_destino
+    
 
-    def get_queryset(self):
-        return (
-            Embarque.objects
-            .filter(
-                estado=Embarque.EST_ENVIADO,
-                puerto_destino=self.request.user.puerto
-            )
-            .order_by("-fecha_salida")
-        )
+# apps/embarques/views.py
+@login_required
+def manifiesto_validar(request, pk):
+    mc   = get_object_or_404(ManifiestoCarga, pk=pk)
+    user = request.user
+
+    # 1) permiso → puerto del usuario debe estar en la ruta
+    if not (user.is_destino and
+            mc.embarque.ruta.puertos.filter(pk=user.puerto.pk).exists()):
+        messages.error(request, "Sin permisos para validar este manifiesto.")
+        return redirect("pages:home")
+
+    # 2) procesa acción
+    accion = request.POST.get("accion")
+    if accion == "aprobar":
+        mc.estado_mc, mc.validado_por = ManifiestoCarga.APROBADO, user
+    elif accion == "denegar":
+        mc.estado_mc, mc.validado_por = ManifiestoCarga.DENEGADO, user
+    else:
+        messages.error(request, "Acción inválida.")
+        return redirect("embarque_detail", pk=mc.embarque.pk)
+
+    mc.save(update_fields=["estado_mc", "validado_por"])
+
+    # 3) ¡Actualiza el puerto_actual del embarque!
+    embarque = mc.embarque
+    if embarque.puerto_actual != user.puerto:
+        embarque.puerto_actual = user.puerto
+        embarque.save(update_fields=["puerto_actual"])
+
+    messages.success(request, "Manifiesto actualizado correctamente.")
+    return redirect("embarque_detail", pk=embarque.pk)
