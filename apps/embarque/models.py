@@ -200,25 +200,6 @@ class Embarque(models.Model):
         help_text="0 = aún no ha zarpado; 1 = salió del 1er puerto, etc."
     )
 
-    def orden_de_puerto(self, puerto):
-        """
-        Devuelve el número de orden (1,2,3,…) de `puerto`
-        dentro de la ruta, o None si no pertenece a ella.
-        """
-        return (
-            self.ruta.segmentos     # relación Reverse FK
-                .filter(puerto=puerto)
-                .values_list('orden_ruta', flat=True)
-                .first()
-        )
-
-    def puerto_ya_pasado(self, puerto):
-        """
-        True  → el buque ya zarpó de ese puerto (o está más adelante).
-        False → el buque aún no llegó o está en ese puerto.
-        """
-        orden = self.orden_de_puerto(puerto)
-        return orden is not None and orden <= self.orden_actual
 
     @property
     def puertos_transitados(self):
