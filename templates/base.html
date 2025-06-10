@@ -10,12 +10,16 @@
   <header>
     <nav>
         {% if user.is_authenticated  %}
-            <span>Hola, {{ user.username }} </span> |
+            <span>Hola, {{ user.username }} - {{user.puerto}}</span> |
             <form action="{% url 'usuarios:logout' %}" method="post" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" style="background:none;border:none;color:#00f;cursor:pointer;">Cerrar sesión</button>
             </form>
-               <a href="{% url 'embarque_list' %}" class="btn btn-primary">Consultar</a>
+            {% if user.is_destino %}
+                <a href="{% url 'embarque_list' %}" class="btn btn-primary">Consultar</a>
+            {% else %}
+                <a href="{% url 'embarque_list' %}" class="btn btn-primary">Consultar</a>
+            {% endif %}
         {% else %}
             <a href="{% url 'pages:home' %}">Home</a>
         {% endif %}

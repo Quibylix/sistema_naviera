@@ -18,6 +18,7 @@ class ContenedorCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.is_origen
+  
 
     def handle_no_permission(self):
         # Si no es agente de origen, redirigimos o mostramos mensaje
@@ -277,33 +278,50 @@ class ContenedorDestinoListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         )
     
 
+# apps/contenedor/views.py
 @login_required
 @require_POST
 def documento_validar(request, pk):
-    doc = get_object_or_404(Documento, pk=pk)
+    doc  = get_object_or_404(Documento, pk=pk)
     user = request.user
 
-    if not (user.is_destino
-            and doc.contenedor.puerto_descarga== user.puerto):
+    # ─── seguridad ──────────────────────────────────────────
+    if not (user.is_destino and doc.contenedor.puerto_descarga == user.puerto):
         messages.error(request, "Sin permisos.")
         return redirect("pages:home")
 
-    accion = request.POST.get("accion")
-    comentario = request.POST.get("comentario", "").strip()
+    accion      = request.POST.get("accion")           # 'aprobar' | 'rechazar' | 'pendiente'
+    comentario  = request.POST.get("comentario", "").strip()
 
+    # ─── decide nuevo estado ───────────────────────────────
     if accion == "aprobar":
-        doc.estado_doc = Documento.APROBADO
+        nuevo_estado = Documento.APROBADO
+        doc.validado_por = user
     elif accion == "rechazar":
-        doc.estado_doc = Documento.RECHAZADO
+        if not comentario:
+            messages.error(request, "Debes indicar el motivo del rechazo.")
+            return redirect("embarque_detail", pk=doc.contenedor.embarque.pk)
+        nuevo_estado = Documento.RECHAZADO
+        doc.validado_por = user
+    elif accion == "pendiente":
+        nuevo_estado = Documento.PENDIENTE
+        doc.validado_por = None  # Limpiar quién validó si vuelve a pendiente
     else:
         messages.error(request, "Acción inválida.")
         return redirect("embarque_detail", pk=doc.contenedor.embarque.pk)
 
-    doc.comentario = comentario
+    # ─── actualiza y guarda ────────────────────────────────
+    doc.estado_doc = nuevo_estado
+    doc.comentario = comentario if nuevo_estado == Documento.RECHAZADO else ""
+    doc.validado_por = user if nuevo_estado in [Documento.APROBADO, Documento.RECHAZADO] else None
     doc.save(update_fields=["estado_doc", "comentario"])
-
-    # Actualizar estado del contenedor
+    # 1. Actualiza el estado del contenedor primero
     doc.contenedor.actualizar_estado()
 
-    messages.success(request, "Documento actualizado correctamente.")
-    return redirect("embarque_detail", pk=doc.contenedor.embarque.pk)
+    # 2. Luego actualiza el puerto actual del embarque
+    embarque = doc.contenedor.embarque
+    embarque.actualizar_puerto_actual()
+
+
+    messages.success(request, "Documento actualizado.")
+    return redirect("embarque_detail", pk=embarque.pk)
