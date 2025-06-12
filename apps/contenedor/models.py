@@ -6,7 +6,7 @@ from apps.embarque.models import Embarque, Pais, Puerto
 
 class TipoContenedor(models.Model):
     id_tipo_cont = models.CharField(primary_key=True, max_length=4)
-    nombre_tipo_cont = models.CharField(max_length=50)
+    nombre_tipo_cont = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nombre_tipo_cont
@@ -14,15 +14,15 @@ class TipoContenedor(models.Model):
 
 class TipoCarga(models.Model):
     id_tipo_carga = models.AutoField(primary_key=True)
-    descripcion_tipo_carga = models.CharField(max_length=50)
+    descripcion_tipo_carga = models.CharField(max_length=100)
 
 
     def __str__(self):
         return self.descripcion_tipo_carga
 
-class Equipamiento(models.Model):
+class TipoEquipamiento(models.Model):
     id_equipamiento = models.AutoField(primary_key=True)
-    descripcion_equip = models.CharField(max_length=50)
+    descripcion_equip = models.CharField(max_length=100)
 
     def __str__(self):
         return self.descripcion_equip
@@ -31,7 +31,7 @@ class Contenedor(models.Model):
     id_contenedor = models.CharField(primary_key=True, max_length=11,editable=False)
     tipo_contenedor = models.ForeignKey(TipoContenedor, on_delete=models.PROTECT, null=True, related_name="tipo_contenedor")
     tipo_carga = models.ForeignKey(TipoCarga, on_delete=models.PROTECT, null=True, related_name="tipo_carga")
-    equipamiento = models.ForeignKey(Equipamiento, on_delete=models.PROTECT, null=True, related_name="equipamiento_contenedor")
+    equipamiento = models.ForeignKey(TipoEquipamiento, on_delete=models.PROTECT, null=True, related_name="equipamiento_contenedor")
     puerto_procedencia = models.ForeignKey(
         Puerto,
         on_delete=models.PROTECT,

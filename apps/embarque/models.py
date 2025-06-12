@@ -27,7 +27,7 @@ class Puerto(models.Model):
         on_delete=models.PROTECT,
         related_name="puertos",
     )
-    nombre_puerto = models.CharField(max_length=20)
+    nombre_puerto = models.CharField(max_length=50)
 
     PAD = 3                    # cantidad de dígitos ➜ 001, 002, ...
 
@@ -55,7 +55,7 @@ class Puerto(models.Model):
 
 class Ruta(models.Model):
     id_ruta = models.AutoField(primary_key=True)
-    nombre_ruta = models.CharField(max_length=20)
+    nombre_ruta = models.CharField(max_length=50)
     puertos = models.ManyToManyField(
         "Puerto",
         through="SegmentoRuta",
