@@ -45,7 +45,6 @@
         {% else %}Sin zarpar{% endif %}
       </td>
       <td>{{ e.puertos_transitados.0 }} / {{ e.puertos_transitados.1 }}</td>
-      {# ───── ACCIONES según rol/estado ───── #}
       <td>
         <a href="{% url 'embarque_detail' e.pk %}">Ver</a>
         {% if user.is_origen and e.estado == 'borrador' %}

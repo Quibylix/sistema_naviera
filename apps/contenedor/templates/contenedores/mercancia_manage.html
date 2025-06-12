@@ -13,7 +13,6 @@
     </table>
     <button type="submit">Agregar Mercancía</button>
 
-    {# Aquí comprobamos si hay al menos una mercancía #}
     {% if mercancias %}
       <a class="btn btn-primary" href="{% url 'documentos_manage' contenedor.pk %}">
         Siguiente ➜

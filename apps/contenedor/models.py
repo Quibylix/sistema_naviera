@@ -72,7 +72,6 @@ class Contenedor(models.Model):
         if not self.id_contenedor:
             nombre_transportista = self.embarque.nombre_transportista[:3].upper()
             prefijo = f"{nombre_transportista}U"
-            # Bucle para asegurar unicidad
             while True:
                 ultimo = (
                     Contenedor.objects
@@ -81,34 +80,31 @@ class Contenedor(models.Model):
                     .first()
                 )
                 if ultimo:
-                    # Extrae el secuencial del formato ABCU-XXXXXX-X
                     sec = int(ultimo.id_contenedor[5:11]) + 1
                 else:
                     sec = 1
                 sec_str = f"{sec:06d}"
                 digito_control = self._dc(prefijo, sec_str)
                 nuevo_id = f"{prefijo}-{sec_str}-{digito_control}"
-                # Si no existe, lo asigna y sale del bucle
                 if not Contenedor.objects.filter(id_contenedor=nuevo_id).exists():
                     self.id_contenedor = nuevo_id
                     break
         super().save(*args, **kwargs)
 
     def _dc(self, prefijo, sec_str):
-        # dígito de control BIC simplificado
         return sum(map(ord, f"{prefijo}{sec_str}")) % 10
 
     def actualizar_estado(self, save=True):
         docs = self.documentos.all()
 
-        if not docs.exists():                 # sin documentos = sigue igual
+        if not docs.exists():                
             return
 
         if docs.filter(estado_doc=Documento.RECHAZADO).exists():
             nuevo = self.REVOCADO
         elif docs.filter(estado_doc=Documento.PENDIENTE).exists():
             nuevo = self.EN_TRANSITO
-        else:                                 # todos aprobados
+        else:                                 
             nuevo = self.ARRIBADO
 
         if nuevo != self.estado_contenedor:

@@ -5,9 +5,6 @@
 {% block content %}
 <h2>Detalle del Embarque {{ embarque.id_embarque }}</h2>
 
-{# ──────────────────────────────────────────────────────────── #}
-{# 1  INFORMACIÓN GENERAL                                     #}
-{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Información del embarque</h3>
   <div style="display:flex; flex-wrap:wrap; gap:1rem;">
@@ -54,9 +51,6 @@
   </div>
 </section>
 
-{# ──────────────────────────────────────────────────────────── #}
-{# 2  CONTENEDORES                                            #}
-{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Contenedores asociados</h3>
   <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
@@ -93,9 +87,6 @@
   </table>
 </section>
 
-{# ──────────────────────────────────────────────────────────── #}
-{# 3 ▸ MERCANCÍA                                               #}
-{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Mercancía</h3>
   <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
@@ -134,9 +125,6 @@
   </table>
 </section>
 
-{# ──────────────────────────────────────────────────────────── #}
-{# 4 ▸ DOCUMENTACIÓN                                           #}
-{# ──────────────────────────────────────────────────────────── #}
 <section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
   <h3>Documentación</h3>
   <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
@@ -150,7 +138,6 @@
     </thead>
     <tbody>
 
-      {# 4.1 ▸ Manifiesto de carga (fila 0) #}
       {% if user.is_destino and embarque.manifiesto_carga %}
       <tr style="background:#eef;">
         <td>0</td>
@@ -180,7 +167,6 @@
       </tr>
       {% endif %}
 
-      {# 4.2 ▸ Documentos por contenedor #}
       {% for cont in contenedores_visibles %}
         {% for doc in cont.documentos.all %}
         <tr>
