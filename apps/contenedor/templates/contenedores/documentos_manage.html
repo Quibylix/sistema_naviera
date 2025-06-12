@@ -6,14 +6,10 @@
   <h2>Documentación del contenedor {{ contenedor.pk }}</h2>
 
 
-  {# ------------------------------------------------ #}
-  {#        1) BILL OF LADING (tipo_documento=1)      #}
-  {# ------------------------------------------------ #}
   <section>
     <h3>1. Bill of Lading</h3>
 
     {% if docs_bol %}
-      {# Ya existe uno: muestro nombre + enlace al archivo, y botones Editar/Borrar #}
       <table>
         <tr>
           <th>Nombre</th>
@@ -41,10 +37,8 @@
         </tr>
       </table>
     {% else %}
-      {# No existe aún: muestro el formulario para crear el Bill of Lading #}
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {# OJO: “prefix” y “tipo_pk” son obligatorios para que el view sepa qué formulario es #}
         <input type="hidden" name="prefix"  value="bol">
         <input type="hidden" name="tipo_pk" value="1">
 
@@ -72,7 +66,6 @@
           {% endif %}
         </div>
 
-        {# Si tu formulario incluye “tipo_documento” como HiddenInput, no hace falta mostrarlo. #}
         {{ bol_form.tipo_documento }}
 
         <button type="submit" class="btn btn-save">Guardar Bill of Lading</button>
@@ -82,9 +75,6 @@
 
   <hr>
 
-  {# ------------------------------------------------ #}
-  {#       2) FACTURA DE EXPORTACIÓN (tipo_documento=2) #}
-  {# ------------------------------------------------ #}
   <section>
     <h3>2. Factura de Exportación</h3>
 
@@ -119,7 +109,7 @@
           {% endif %}
         </div>
 
-        {{ fac_form.tipo_documento }}  {# habitualmente viene como HiddenInput #}
+        {{ fac_form.tipo_documento }}  
 
         <button type="submit" class="btn btn-{% if consolidado %}new{% else %}save{% endif %}">
           {% if consolidado %}Guardar{% else %}Guardar Factura{% endif %}
@@ -130,9 +120,6 @@
 
   <hr>
 
-  {# ------------------------------------------------ #}
-  {#       3) CERTIFICADO DE ORIGEN (tipo_documento=3)  #}
-  {# ------------------------------------------------ #}
   <section>
     <h3>3. Certificado de Origen</h3>
 
@@ -251,9 +238,6 @@
 
   
 
-  {# ------------------------------------------------ #}
-  {#         5) RESUMEN GLOBAL DE TODOS LOS DOCUMENTOS   #}
-  {# ------------------------------------------------ #}
   <h3>Resumen global</h3>
   <table>
     <tr>

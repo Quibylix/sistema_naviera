@@ -7,34 +7,30 @@ from apps.embarque.models import Puerto # para la consulta
 class ContenedorForm(forms.ModelForm):
     class Meta:
         model = Contenedor
-        # NO incluimos puerto_procedencia
         fields = [
             "tipo_contenedor",
             "tipo_carga",
             "equipamiento",
-            "puerto_descarga",          # destino filtrado
+            "puerto_descarga",          
             "es_consolidado",
         ]
     
 
-    # ─── filtros dinámicos ───
     def __init__(self, *args, **kwargs):
-        self.embarque = kwargs.pop("embarque")   # viene desde la vista
+        self.embarque = kwargs.pop("embarque")   
         super().__init__(*args, **kwargs)
 
-        # Destino = puertos de la ruta menos el de procedencia
         ruta = self.embarque.ruta
         if ruta:
             puertos_ruta = (
                 Puerto.objects
-                .filter(segmentos__ruta=ruta)   # FK desde SegmentoRuta
+                .filter(segmentos__ruta=ruta)   
                 .distinct()
             )
             self.fields["puerto_descarga"].queryset = (
                 puertos_ruta.exclude(pk=self.embarque.puerto_procedencia_id)
             )
 
-    # Validación extra (por si alguien intenta saltarse el form)
     def clean_puerto_descarga(self):
         destino = self.cleaned_data["puerto_descarga"]
         if destino == self.embarque.puerto_procedencia:
@@ -57,7 +53,6 @@ class MercanciaForm(forms.ModelForm):
             "descripcion_mercancia": forms.Textarea(attrs={"rows": 2}),
         }
 
-    # ─── recibimos el contenedor para fijar la FK ───
     def __init__(self, *args, **kwargs):
         self.contenedor = kwargs.pop("contenedor")
         super().__init__(*args, **kwargs)
@@ -70,7 +65,6 @@ class MercanciaForm(forms.ModelForm):
         return obj
     
 
-# apps/contenedor/forms.py
 
 
 
@@ -90,38 +84,24 @@ class DocumentoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Sacamos contenedor y tipo_fijo (Bill of Lading, Factura, Certificado)
         self.contenedor = kwargs.pop("contenedor")
         self.tipo_fijo  = kwargs.pop("tipo_fijo", None)
         super().__init__(*args, **kwargs)
 
-        # ---------------------------------------------------------
-        # 1) Primero: detectamos si este form es “soporte” por el prefix
-        # ---------------------------------------------------------
         if self.prefix == "supp":
-            # Eliminamos el campo ForeignKey original
-            # porque no queremos un <select> de TipoDocumento en Soporte
             self.fields.pop("tipo_documento")
 
-            # En su lugar, añadimos un CharField para que el usuario escriba el tipo
             self.fields["tipo_soporte"] = forms.CharField(
                 max_length=50,
                 label="Tipo de documento de soporte",
                 widget=forms.TextInput(attrs={"placeholder": "Ingrese el tipo de soporte"}),
             )
         else:
-            # ---------------------------------------------------------
-            # 2) Si NO es “supp” (o sea: bol/fac/cert), forzamos el tipo fijo
-            # ---------------------------------------------------------
             if self.tipo_fijo:
-                # Filtramos queryset para que only venga el tipo fijo
                 self.fields["tipo_documento"].queryset = TipoDocumento.objects.filter(pk=self.tipo_fijo)
                 self.fields["tipo_documento"].initial  = self.tipo_fijo
                 self.fields["tipo_documento"].widget   = forms.HiddenInput()
 
-        # ---------------------------------------------------------
-        # 3) Hacemos obligatorios siempre “Archivo” y “nombre_archivo”
-        # ---------------------------------------------------------
         for f in ("archivo", "nombre_archivo"):
             self.fields[f].required = True
             self.fields[f].widget.attrs["required"] = "required"
@@ -129,25 +109,17 @@ class DocumentoForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
 
-        # ---------------------------------------------------------
-        # 4) Si es soporte: validamos que haya texto en “tipo_soporte”
-        # ---------------------------------------------------------
         if self.prefix == "supp":
             tipo_texto = cleaned.get("tipo_soporte", "").strip()
             if not tipo_texto:
                 raise ValidationError("El tipo de documento de soporte no puede ir vacío.")
-            # No aplicamos validación de unicidad para soporte, porque pueden repetirse
-            # (si quisieras evitar que escriban el mismo nombre dos veces, podrías hacerlo aquí).
         else:
-            # ---------------------------------------------------------
-            # 5) Lógica de unicidad para tipos 1,2,3 (bol, factura, cert)
-            # ---------------------------------------------------------
             tipo = cleaned.get("tipo_documento")
             if tipo:
-                UNICOS_SIEMPRE = {1, 3}  # id=1 Bill of Lading, id=3 Certificado
+                UNICOS_SIEMPRE = {1, 3}  
                 if tipo.pk in UNICOS_SIEMPRE:
                     check_unique = True
-                elif tipo.pk == 2:  # Factura (única si NO es consolidado)
+                elif tipo.pk == 2: 
                     check_unique = not self.contenedor.es_consolidado
                 else:
                     check_unique = False
@@ -164,9 +136,6 @@ class DocumentoForm(forms.ModelForm):
                             f"Ya existe un documento tipo “{tipo}” en este contenedor."
                         )
 
-        # ---------------------------------------------------------
-        # 6) Validación de extensión (aplica a todos los casos)
-        # ---------------------------------------------------------
         if self.cleaned_data.get("archivo"):
             name = self.cleaned_data["archivo"].name.lower()
             allowed = {".pdf", ".jpg", ".jpeg", ".png"}
@@ -175,20 +144,12 @@ class DocumentoForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
-        # ---------------------------------------------------------
-        # 7) Si es soporte, creamos/buscamos el TipoDocumento antes de asignarlo
-        # ---------------------------------------------------------
         if self.prefix == "supp":
             tipo_texto = self.cleaned_data.get("tipo_soporte").strip()
-            # get_or_create para no duplicar tipos idénticos
             tipo_obj, _ = TipoDocumento.objects.get_or_create(
                 nombre_tipo_doc=tipo_texto
             )
-            # ahora asignamos al campo real de la instancia
             self.instance.tipo_documento = tipo_obj
-        # ---------------------------------------------------------
-        # 8) El resto de campos se salvan normalmente
-        # ---------------------------------------------------------
         obj = super().save(commit=False)
         obj.contenedor = self.contenedor
         if commit:

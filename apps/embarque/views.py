@@ -11,7 +11,6 @@ from django.shortcuts import redirect,get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-# apps/embarques/views.py
 
 class EmbarqueListView(LoginRequiredMixin, ListView):
     """
@@ -34,12 +33,11 @@ class EmbarqueListView(LoginRequiredMixin, ListView):
             return (
                 qs.filter(
                     estado=Embarque.EST_ENVIADO,
-                    ruta__puertos=user.puerto      # puerto dentro de la ruta
+                    ruta__puertos=user.puerto      
                 )
                 .order_by("-fecha_salida")
             )
 
-        # Otros tipos de usuario → lista vacía
         return qs.none()
 
 def puede_validar(user, embarque):
@@ -51,13 +49,12 @@ def puede_validar(user, embarque):
         return False
 
     orden_user = embarque.orden_de_puerto(user.puerto)
-    if not orden_user:                       # su puerto no en ruta
+    if not orden_user:                       
         return False
 
     if orden_user != embarque.orden_actual + 1:
-        return False                         # aún no es su turno
+        return False                         
 
-    # si hay puerto anterior, debe estar completado
     if embarque.orden_actual > 0:
         puerto_prev = embarque.ruta.puertos.get(
             segmentos__orden_ruta=embarque.orden_actual
@@ -78,7 +75,7 @@ class EmbarqueCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return self.request.user.is_authenticated and self.request.user.is_origen
 
     def handle_no_permission(self):
-        return redirect("pages:home")  # o una página de “sin permisos”
+        return redirect("pages:home")  
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -90,14 +87,14 @@ class EmbarqueCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             can_delete=False,
             max_num=1,
             validate_max=True,
-            min_num=1,           # <--- agrega esto
+            min_num=1,         
             validate_min=True,
         )
         if self.request.method == 'POST':
             data['formset_manifiesto'] = ManifiestoFormSet(
                 self.request.POST,
                 self.request.FILES,
-                instance=Embarque()  # Creamos una instancia “vacía” para que no intente usar None
+                instance=Embarque()  
             )
         else:
             data['formset_manifiesto'] = ManifiestoFormSet(instance=Embarque())
@@ -134,7 +131,7 @@ class EmbarqueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         )
 
     def handle_no_permission(self):
-        return redirect("pages:home")  # o página de “sin permisos”
+        return redirect("pages:home")  
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -160,7 +157,7 @@ class EmbarqueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return data
 
     def form_valid(self, form):
-        self.object = form.save()  # se actualizan los campos de Embarque
+        self.object = form.save()  
         context = self.get_context_data()
         formset_manifiesto = context['formset_manifiesto']
         if formset_manifiesto.is_valid():
@@ -232,13 +229,11 @@ def manifiesto_validar(request, pk):
     mc   = get_object_or_404(ManifiestoCarga, pk=pk)
     user = request.user
 
-    # 1) permiso → puerto del usuario debe estar en la ruta
     if not (user.is_destino and
             mc.embarque.ruta.puertos.filter(pk=user.puerto.pk).exists()):
         messages.error(request, "Sin permisos para validar este manifiesto.")
         return redirect("pages:home")
 
-    # 2) procesa acción
     accion = request.POST.get("accion")
     if accion == "aprobar":
         mc.estado_mc, mc.validado_por = ManifiestoCarga.APROBADO, user
@@ -250,7 +245,6 @@ def manifiesto_validar(request, pk):
 
     mc.save(update_fields=["estado_mc", "validado_por"])
 
-    # 3) ¡Actualiza el puerto_actual del embarque!
     embarque = mc.embarque
     if embarque.puerto_actual != user.puerto:
         embarque.puerto_actual = user.puerto

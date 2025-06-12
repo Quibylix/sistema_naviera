@@ -14,9 +14,9 @@ class CustomUser(AbstractUser):
 
     role = models.CharField(max_length=30, choices=ROLE_CHOICES)
 
-    # En lugar de importar apps.embarque.models, referimos con strings:
+   
     pais = models.ForeignKey(
-        "embarque.Pais",            # nombre del app y del modelo separados por punto
+        "embarque.Pais",            
         on_delete=models.PROTECT,
         related_name="pais",
         null=True,
@@ -24,7 +24,7 @@ class CustomUser(AbstractUser):
     )
 
     puerto = models.ForeignKey(
-        "embarque.Puerto",          # igual, usamos la cadena "embarque.Puerto"
+        "embarque.Puerto",          
         on_delete=models.PROTECT,
         related_name="puerto",
         null=True,
