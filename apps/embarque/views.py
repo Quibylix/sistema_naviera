@@ -113,8 +113,15 @@ class EmbarqueCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         else:
             self.object.delete()
             return self.form_invalid(form)
+        
+    
 
         return super().form_valid(form)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 class EmbarqueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model         = Embarque
@@ -155,6 +162,11 @@ class EmbarqueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         else:
             data['formset_manifiesto'] = ManifiestoFormSet(instance=self.object)
         return data
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         self.object = form.save()  

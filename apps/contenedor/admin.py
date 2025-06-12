@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contenedor, TipoContenedor, Bulto, Mercancia, TipoCarga,Documento,Equipamiento,TipoDocumento
+from .models import Contenedor, TipoContenedor, Bulto, Mercancia, TipoCarga,Documento,TipoEquipamiento,TipoDocumento
 
 @admin.register(Contenedor)
 class ContenedorAdmin(admin.ModelAdmin):
@@ -35,7 +35,7 @@ class DocumentoAdmin(admin.ModelAdmin):
     list_filter = ("estado_doc", "tipo_documento", "contenedor")
     search_fields = ("nombre_archivo",)
 
-@admin.register(Equipamiento)
+@admin.register(TipoEquipamiento)
 class EquipamientoAdmin(admin.ModelAdmin):
     list_display = ("id_equipamiento", "descripcion_equip")
     list_filter = ("id_equipamiento", "descripcion_equip")
