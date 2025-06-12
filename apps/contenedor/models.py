@@ -28,10 +28,10 @@ class TipoEquipamiento(models.Model):
         return self.descripcion_equip
 
 class Contenedor(models.Model):
-    id_contenedor = models.CharField(primary_key=True, max_length=11,editable=False)
+    id_contenedor = models.CharField(primary_key=True, max_length=16,editable=False)
     tipo_contenedor = models.ForeignKey(TipoContenedor, on_delete=models.PROTECT, null=True, related_name="tipo_contenedor")
     tipo_carga = models.ForeignKey(TipoCarga, on_delete=models.PROTECT, null=True, related_name="tipo_carga")
-    equipamiento = models.ForeignKey(TipoEquipamiento, on_delete=models.PROTECT, null=True, related_name="equipamiento_contenedor")
+    tipo_equipamiento = models.ForeignKey(TipoEquipamiento, on_delete=models.PROTECT, null=True, related_name="tipo_equipamiento")
     puerto_procedencia = models.ForeignKey(
         Puerto,
         on_delete=models.PROTECT,

@@ -10,7 +10,7 @@ class ContenedorForm(forms.ModelForm):
         fields = [
             "tipo_contenedor",
             "tipo_carga",
-            "equipamiento",
+            "tipo_equipamiento",
             "puerto_descarga",          
             "es_consolidado",
         ]
