@@ -2,9 +2,6 @@
 
 Proyecto de ciclo para la materia Herramientas de Productividad.
 
-Edicion
-
-
-Paquetes a usar en el venv
+## Paquetes a usar en el venv
 
 pip install Django django-formtools
