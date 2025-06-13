@@ -1,72 +1,138 @@
 {# templates/embarques/embarque_list.html #}
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Embarques{% endblock %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/embarque_list.css' %}">
+{% endblock %}
 {% block content %}
-<h2>Listado de Embarques</h2>
 
-{% if user.is_origen %}
-  <p><a href="{% url 'embarque_create' %}">Nuevo Embarque</a></p>
-{% endif %}
-
-<table border="1" cellpadding="4">
-  <thead>
-    <tr>
-      <th>ID</th><th>Ruta</th><th>F. Salida</th><th>Puerto origen</th>
-      <th>Puerto actual</th><th>Puerto destino</th><th>País origen</th>
-      <th>País destino</th><th>Nombre</th><th>Buque</th><th>Estado</th><th>Puertos transitados</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for e in embarques %}
-    <tr>
-      <td>{{ e.id_embarque }}</td>
-      <td>{{ e.ruta }}</td>
-      <td>{{ e.fecha_salida|date:"d M, Y" }}</td>
-      <td>{{ e.puerto_procedencia }}</td>
-      <td>
-        {% if e.puerto_actual %}
-          {{ e.puerto_actual.nombre_puerto }}
-        {% else %}
-          {{ e.puerto_procedencia.nombre_puerto }}
-        {% endif %}
-      </td>
-      <td>{{ e.puerto_destino }}</td>
-      <td>{{ e.pais_procedencia }}</td>
-      <td>{{ e.pais_destino }}</td>
-      <td>{{ e.nombre_transportista }}</td>
-      <td>{{ e.buque }}</td>
-      <td>
-        {% if e.puerto_actual %}
-          {% if e.puerto_actual.pk == e.puerto_procedencia.pk %}Sin zarpar
-          {% elif e.puerto_actual.pk == e.puerto_destino.pk %}Finalizado
-          {% else %}En tránsito{% endif %}
-        {% else %}Sin zarpar{% endif %}
-      </td>
-      <td>{{ e.puertos_transitados.0 }} / {{ e.puertos_transitados.1 }}</td>
-      {# ───── ACCIONES según rol/estado ───── #}
-      <td>
-        <a href="{% url 'embarque_detail' e.pk %}">Ver</a>
-        {% if user.is_origen and e.estado == 'borrador' %}
-            | <a href="{% url 'embarque_update' e.pk %}">Editar</a>
-            | <a href="{% url 'embarque_delete' e.pk %}">Borrar</a>
-            | <a href="{% url 'contenedor_create' e.pk %}">Crear Contenedor</a>|
-            {% if e.puede_enviar %}
-                <form action="{% url 'embarque_enviar' e.pk %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" style="background:none;border:none;color:#00f;cursor:pointer;"
-                onclick="return confirm('¿Estás seguro de que deseas enviar este embarque?');">Enviar</button>
-                </form>
+<!-- Sección principal del listado -->
+<section class="container-fluid mt-4">
+  <div class="align-items-center"><h2 class="mb-3 ">Listado de Embarques</h2></div>
+    
+  
+  <!-- Tabla responsiva de embarques -->
+  <figure class="table-responsive">
+    <table class="table table-bordered table-striped align-middle text-center">
+      <thead class="">
+        <tr>
+          <th>ID</th>
+          <th>Ruta</th>
+          <th>F. Salida</th>
+          <th>Puerto origen</th>
+          <th>Puerto actual</th>
+          <th>Puerto destino</th>
+          <th>País origen</th>
+          <th>País destino</th>
+          <th>Nombre</th>
+          <th>Buque</th>
+          <th>Estado</th>
+          <th>Puertos transitados</th>
+          <th class="col-acciones">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in embarques %}
+        <tr>
+          <td>{{ e.id_embarque }}</td>
+          <td>{{ e.ruta }}</td>
+          <td>{{ e.fecha_salida|date:"d M, Y" }}</td>
+          <td>{{ e.puerto_procedencia }}</td>
+          <td>
+            {% if e.puerto_actual %}
+              {{ e.puerto_actual.nombre_puerto }}
             {% else %}
-                <span style="color:gray;" title="Debe haber al menos un contenedor con mercancías y documentos completos">Enviar</span>
+              {{ e.puerto_procedencia.nombre_puerto }}
             {% endif %}
-        {% endif %}
-      </td>
-    </tr>
-    {% empty %}
-      <tr><td colspan="12" style="text-align:center;">Sin registros</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+          </td>
+          <td>{{ e.puerto_destino }}</td>
+          <td>{{ e.pais_procedencia }}</td>
+          <td>{{ e.pais_destino }}</td>
+          <td>{{ e.nombre_transportista }}</td>
+          <td>{{ e.buque }}</td>
+          <td>
+            {% if e.puerto_actual %}
+              {% if e.puerto_actual.pk == e.puerto_procedencia.pk %}
+                Sin zarpar
+              {% elif e.puerto_actual.pk == e.puerto_destino.pk %}
+                Finalizado
+              {% else %}
+                En tránsito
+              {% endif %}
+            {% else %}
+              Sin zarpar
+            {% endif %}
+          </td>
+          <td>{{ e.puertos_transitados.0 }} / {{ e.puertos_transitados.1 }}</td>
+
+          {# ───── ACCIONES según rol/estado ───── #}
+          <td class="col-acciones text-center">
+            <nav class="d-flex justify-content-center gap-2 flex-wrap" aria-label="Acciones">
+              <a href="{% url 'embarque_detail' e.pk %}" class="text-info" title="Ver detalle">
+                <i class="bi bi-info-circle-fill"></i>
+              </a>
+              {% if user.is_origen and e.estado == 'borrador' %}
+                <a href="{% url 'embarque_update' e.pk %}" class="text-primary" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'embarque_delete' e.pk %}" class="text-danger" title="Borrar">
+                  <i class="bi bi-trash3"></i>
+                </a>
+                <a href="{% url 'contenedor_create' e.pk %}" class="text-secondary" title="Crear Contenedor">
+                  <i class="bi bi-bag"></i>
+                </a>
+                {% if e.puede_enviar %}
+                <form action="{% url 'embarque_enviar' e.pk %}" method="post" class="d-inline form-enviar" data-id="{{ e.pk }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link p-0 text-success btn-enviar" title="Enviar">
+                  <i class="bi bi-send"></i>
+                </button>
+              </form>
+                {% else %}
+                <span class="text-muted" title="Debe haber al menos un contenedor con mercancías y documentos completos">
+                  <i class="bi bi-send"></i>
+                </span>
+                {% endif %}
+              {% endif %}
+            </nav>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="13" class="text-center text-muted">Sin registros</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </figure>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-enviar').forEach(button => {
+      button.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const form = this.closest('form');
+
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: 'Una vez enviado, no podrás editar este embarque.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#1b2a49',
+          cancelButtonColor: '#aaa',
+          confirmButtonText: 'Sí, enviar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit();
+          }
+        });
+      });
+    });
+  });
+</script>
 {% endblock %}

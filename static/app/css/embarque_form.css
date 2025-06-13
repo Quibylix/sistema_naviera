@@ -1,0 +1,38 @@
+/* Color personalizado para botones dentro del formulario */
+.btnn{
+  background-color: #1b2a49 !important;
+  border-color: #1b2a49 !important;
+}
+#embarqueForm .btn-primary:hover {
+  background-color: #a9c8ea !important;
+  border-color: #1b2a49 !important;
+}
+#embarqueForm .btn-success {
+  background-color: #1b2a49 !important;
+  border-color: #a9c8ea !important;
+}
+#embarqueForm .btn-success:hover {
+  background-color: #218838 !important;
+  border-color: #a9c8ea !important;
+}
+#embarqueForm .btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+#embarqueForm .btn-secondary:hover {
+  background-color: #5a6268 !important;
+  border-color: #545b62 !important;
+}
+
+/* Estilos para nav-tabs */
+.nav-tabs .nav-link {
+  color: #1b2a49 !important;
+}
+.nav-tabs .nav-link:hover {
+  color: #1b2a49 !important;
+}
+.nav-tabs .nav-link.active {
+  color: #fff !important;
+  background-color: #1b2a49 !important;
+  border-color: #1b2a49 !important;
+}

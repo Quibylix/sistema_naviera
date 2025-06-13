@@ -1,11 +1,16 @@
 {# templates/registration/login_origen.html #}
 {% extends "base.html" %}
+{% load widget_tweaks %}
 {% block title %}Iniciar Sesión – Agente Origen{% endblock %}
 
 {% block content %}
-  <h2>Login – Agente Aduanal (Puerto de Origen)</h2>
 
-  <form method="post" novalidate>
+<div class="login-card text-white  justify-content-center formContainer mt-5">
+  <h2 class="text-center">Login</h2>
+    <h3 class="text-center">Agente Aduanal</h3>
+    <h4 class="text-center">(Puerto de Origen)</h4>
+
+    <form method="post" novalidate>
     {% csrf_token %}
 
     {{ form.non_field_errors }}
@@ -25,10 +30,14 @@
       {% endif %}
     </div>
 
-    <button type="submit" class="btn btn-primary">Ingresar</button>
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary customBtn">Ingresar</button>
+    </div>
+    
   </form>
+</div>
 
-  <p style="margin-top:20px;">
-    <a href="{% url 'pages:home' %}">← Volver a la página de inicio</a>
-  </p>
+<div class="text-center mt-3">
+ <a href="{% url 'pages:home' %}" class="custom-return-link">← Volver a la página de inicio</a>
+</div>
 {% endblock %}

@@ -3,52 +3,117 @@
 {% block title %}Detalle Embarque {{ embarque.id_embarque }}{% endblock %}
 
 {% block content %}
-<h2>Detalle del Embarque {{ embarque.id_embarque }}</h2>
+<style>
+  :root {
+  --azul-oscuro: #1b2a49;
+  --azul-medio: #243865;
+  --azul-claro: #eef2f8;
+  --gris-borde: #c6c8d0;
+}
+
+.card {
+  border: 1px solid var(--gris-borde);
+  background: #fff;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+}
+
+.card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: .8rem;
+  color: var(--azul-oscuro);
+}
+
+.form-grid {
+  display: grid;
+  gap: .7rem 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  font-size: .78rem;
+  gap: .15rem;
+}
+
+.form-field input {
+  padding: .3rem .4rem;
+  border: 1px solid var(--gris-borde);
+  border-radius: 4px;
+  font-size: .78rem;
+  background: #f9f9f9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: .5rem;
+  font-size: .78rem;
+}
+
+th, td {
+  border: 1px solid var(--gris-borde);
+  padding: .45rem .4rem;
+  text-align: center;
+}
+
+th {
+  background: var(--azul-medio);
+  color: #fff;
+  font-weight: 500;
+}
+
+tbody tr:nth-child(even) { background: var(--azul-claro); }
+tbody tr:nth-child(odd) { background: #fff; }
+
+a {
+  color: var(--azul-oscuro);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+</style>
+<main>
 
 {# ──────────────────────────────────────────────────────────── #}
 {# 1  INFORMACIÓN GENERAL                                     #}
 {# ──────────────────────────────────────────────────────────── #}
-<section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
-  <h3>Información del embarque</h3>
-  <div style="display:flex; flex-wrap:wrap; gap:1rem;">
-    <div><strong>ID:</strong><br>{{ embarque.id_embarque }}</div>
-    <div><strong>Ruta:</strong><br>{{ embarque.ruta.nombre_ruta }}</div>
-    <div><strong>F. salida:</strong><br>{{ embarque.fecha_salida|date:"d/m/Y" }}</div>
-    <div><strong>Buque:</strong><br>{{ embarque.buque.nombre_buque }}</div>
-    <div><strong>Transportista:</strong><br>{{ embarque.nombre_transportista }}</div>
-    <div><strong>Pto. origen:</strong><br>{{ embarque.puerto_procedencia.nombre_puerto }}</div>
-    <div><strong>País origen:</strong><br>{{ embarque.pais_procedencia.nombre_pais }}</div>
-    <div><strong>Pto. destino:</strong><br>{{ embarque.puerto_destino.nombre_puerto }}</div>
-    <div><strong>País destino:</strong><br>{{ embarque.pais_destino.nombre_pais }}</div>
-    <div><strong>Pto. actual:</strong><br>
-      {% if embarque.puerto_actual %}
-        {{ embarque.puerto_actual.nombre_puerto }}
-      {% else %}
-        {{ embarque.puerto_procedencia.nombre_puerto }}
-      {% endif %}
+<section class="card">
+  <h2>Información del embarque</h2>
+  <div class="form-grid">
+    <div class="form-field"><label>ID</label><input type="text" value="{{ embarque.id_embarque }}" readonly></div>
+    <div class="form-field"><label>Ruta</label><input type="text" value="{{ embarque.ruta.nombre_ruta }}" readonly></div>
+    <div class="form-field"><label>F. salida</label><input type="text" value="{{ embarque.fecha_salida|date:'d/m/Y' }}" readonly></div>
+    <div class="form-field"><label>Buque</label><input type="text" value="{{ embarque.buque.nombre_buque }}" readonly></div>
+    <div class="form-field"><label>Transportista</label><input type="text" value="{{ embarque.nombre_transportista }}" readonly></div>
+    <div class="form-field"><label>Pto. origen</label><input type="text" value="{{ embarque.puerto_procedencia.nombre_puerto }}" readonly></div>
+    <div class="form-field"><label>País origen</label><input type="text" value="{{ embarque.pais_procedencia.nombre_pais }}" readonly></div>
+    <div class="form-field"><label>Pto. destino</label><input type="text" value="{{ embarque.puerto_destino.nombre_puerto }}" readonly></div>
+    <div class="form-field"><label>País destino</label><input type="text" value="{{ embarque.pais_destino.nombre_pais }}" readonly></div>
+    <div class="form-field"><label>Pto. actual</label>
+      <input type="text" value="{% if embarque.puerto_actual %}{{ embarque.puerto_actual.nombre_puerto }}{% else %}{{ embarque.puerto_procedencia.nombre_puerto }}{% endif %}" readonly>
     </div>
-    <div><strong>Estado:</strong><br>
-      {% if embarque.puerto_actual %}
-        {% if embarque.puerto_actual.pk == embarque.puerto_procedencia.pk %}
-          Sin zarpar
-        {% elif embarque.puerto_actual.pk == embarque.puerto_destino.pk %}
-          Finalizado
-        {% else %}
-          En tránsito
-        {% endif %}
-      {% else %}
-        Sin zarpar
-      {% endif %}
+    <div class="form-field"><label>Estado</label>
+      <input type="text" value="{% if embarque.puerto_actual %}
+        {% if embarque.puerto_actual.pk == embarque.puerto_procedencia.pk %}Sin zarpar
+        {% elif embarque.puerto_actual.pk == embarque.puerto_destino.pk %}Finalizado
+        {% else %}En tránsito{% endif %}
+      {% else %}Sin zarpar{% endif %}" readonly>
     </div>
-    <div>
-      <strong>Puertos transitados:</strong>
-      {{ embarque.puertos_transitados.0 }} / {{ embarque.puertos_transitados.1 }}
+    <div class="form-field"><label>Puertos transitados</label>
+      <input type="text" value="{{ embarque.puertos_transitados.0 }} / {{ embarque.puertos_transitados.1 }}" readonly>
     </div>
-    <div><strong>Manifiesto de carga:</strong><br>
+    <div class="form-field"><label>Manifiesto de carga</label>
       {% if embarque.manifiesto_carga %}
         <a href="{{ embarque.manifiesto_carga.doc_mc.url }}" target="_blank">Ver Manifiesto</a>
       {% else %}
-        No disponible
+        <span>No disponible</span>
       {% endif %}
     </div>
   </div>
@@ -57,11 +122,11 @@
 {# ──────────────────────────────────────────────────────────── #}
 {# 2  CONTENEDORES                                            #}
 {# ──────────────────────────────────────────────────────────── #}
-<section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
-  <h3>Contenedores asociados</h3>
-  <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
+<section class="card">
+  <h2>Contenedores asociados</h2>
+  <table>
     <thead>
-      <tr style="background:#f0f0f0;">
+      <tr>
         <th>#</th><th>ID Contenedor</th><th>Tipo carga</th>
         <th>Pto. origen</th><th>Pto. destino</th>
         <th>F. salida</th><th>F. llegada</th><th>Estado</th>
@@ -80,10 +145,10 @@
         <td>{% if cont.fecha_llegada %}{{ cont.fecha_llegada|date:"d/m/Y" }}{% else %}–{% endif %}</td>
         <td>{{ cont.estado_contenedor }}</td>
         {% if user.is_origen and embarque.estado == 'borrador' %}
-          <td>
-            <a href="{% url 'contenedor_edit' cont.pk %}">Editar</a> |
-            <a href="{% url 'contenedor_delete' cont.pk %}">Eliminar</a>
-          </td>
+        <td>
+          <a href="{% url 'contenedor_edit' cont.pk %}">Editar</a> |
+          <a href="{% url 'contenedor_delete' cont.pk %}">Eliminar</a>
+        </td>
         {% endif %}
       </tr>
       {% empty %}
@@ -96,11 +161,11 @@
 {# ──────────────────────────────────────────────────────────── #}
 {# 3 ▸ MERCANCÍA                                               #}
 {# ──────────────────────────────────────────────────────────── #}
-<section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
-  <h3>Mercancía</h3>
-  <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
+<section class="card">
+  <h2>Mercancía</h2>
+  <table>
     <thead>
-      <tr style="background:#f0f0f0;">
+      <tr>
         <th>#</th><th>ID Contenedor</th><th>Mercancía</th><th>Descripción</th>
         <th>Cant. bultos</th><th>Clase bultos</th><th>País origen</th><th>Peso bruto</th>
       </tr>
@@ -121,11 +186,7 @@
           </tr>
           {% endfor %}
         {% else %}
-          <tr>
-            <td colspan="8" style="text-align:center;">
-              El contenedor {{ cont.id_contenedor }} no tiene mercancías.
-            </td>
-          </tr>
+          <tr><td colspan="8" style="text-align:center;">El contenedor {{ cont.id_contenedor }} no tiene mercancías.</td></tr>
         {% endif %}
       {% empty %}
         <tr><td colspan="8" style="text-align:center;">No hay mercancía.</td></tr>
@@ -137,11 +198,11 @@
 {# ──────────────────────────────────────────────────────────── #}
 {# 4 ▸ DOCUMENTACIÓN                                           #}
 {# ──────────────────────────────────────────────────────────── #}
-<section style="border:1px solid #ccc; padding:1rem; margin-bottom:1.5rem;">
-  <h3>Documentación</h3>
-  <table border="1" cellpadding="4" style="width:100%;border-collapse:collapse;">
+<section class="card">
+  <h2>Documentación</h2>
+  <table>
     <thead>
-      <tr style="background:#f0f0f0;">
+      <tr>
         <th>#</th><th>ID Contenedor</th><th>Tipo doc.</th><th>Archivo</th>
         <th>Descripción</th><th>Estado</th>
         {% if user.is_destino %}<th>Acciones</th>{% endif %}
@@ -149,7 +210,6 @@
       </tr>
     </thead>
     <tbody>
-
       {# 4.1 ▸ Manifiesto de carga (fila 0) #}
       {% if user.is_destino and embarque.manifiesto_carga %}
       <tr style="background:#eef;">
@@ -159,7 +219,6 @@
         <td><a href="{{ embarque.manifiesto_carga.doc_mc.url }}" target="_blank">{{ embarque.manifiesto_carga.nombre_mc }}</a></td>
         <td>{{ embarque.manifiesto_carga.nombre_mc }}</td>
         <td>{{ embarque.manifiesto_carga.estado_mc }}</td>
-
         {% if user.is_destino %}
         <td>
           {% if embarque.manifiesto_carga.estado_mc != 'Aprobado' %}
@@ -242,4 +301,6 @@
 </section>
 
 <p><a href="{% url 'embarque_list' %}">← Volver al listado de embarques</a></p>
+
+</main>
 {% endblock %}

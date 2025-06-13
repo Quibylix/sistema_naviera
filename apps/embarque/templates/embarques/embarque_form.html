@@ -1,51 +1,87 @@
-{# templates/embarques/embarque_form.html #}
 {% extends "base.html" %}
+{% load widget_tweaks static %}
+
+{# Enlaza CSS específico para este form #}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/embarque_form.css' %}">
+{% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>
-    {% if form.instance.pk %}Editar Embarque{% else %}Crear Embarque{% endif %}
-  </title>
-</head>
-<body>
-  <h1>
+<div class="container mt-5">
+  <h1 class="mb-4 text-center">
     {% if form.instance.pk %}Editar Embarque{% else %}Crear Embarque{% endif %}
   </h1>
 
-  <form method="post" enctype="multipart/form-data">
+  <!-- Pestañas -->
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button">
+        Información de viaje
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf" type="button">
+        Manifiesto de carga
+      </button>
+    </li>
+  </ul>
+
+  <form id="embarqueForm" class="needs-validation" novalidate method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <div class="tab-content">
 
-    <fieldset>
-      <legend>Datos de Embarque</legend>
-      {{ form.as_p }}
-    </fieldset>
+      <!-- Pestaña 1 -->
+      <div class="tab-pane fade show active" id="info">
+        <fieldset>
+          <legend class="fs-5">Datos de Embarque</legend>
+          {% for field in form %}
+            <div class="mb-3">
+              {{ field.label_tag }}
+              {{ field|add_class:"form-control"|attr:"required:required" }}
+              <div class="invalid-feedback">
+                Por favor complete {{ field.label }}.
+              </div>
+            </div>
+          {% endfor %}
+        </fieldset>
+        <div class="text-end">
+          <button type="button" class="btn btn-primary" id="btnSiguiente">Siguiente</button>
+        </div>
+      </div>
 
-    <fieldset>
-      <legend>Manifiesto de Carga (PDF)</legend>
+      <!-- Pestaña 2 -->
+      <div class="tab-pane" id="pdf">
+        <fieldset>
+          <legend>Manifiesto de Carga (PDF)</legend>
+          {{ formset_manifiesto.management_form }}
+          {% for subform in formset_manifiesto.forms %}
+            {% for field in subform.visible_fields %}
+              <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field|add_class:"form-control"|attr:"required:required" }}
+                <div class="invalid-feedback">
+                  Por favor complete {{ field.label }}.
+                </div>
+              </div>
+            {% endfor %}
+            {% if subform.instance.archivo %}
+              <p>
+                Archivo actual: <a href="{{ subform.instance.archivo.url }}" target="_blank">
+                  {{ subform.instance.archivo.name|slice:"10:" }}
+                </a>
+              </p>
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" id="btnAtras">Atrás</button>
+          <button type="submit" class="btn btn-success">
+            {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %}
+          </button>
+        </div>
+      </div>
 
-      {{ formset_manifiesto.management_form }}
-
-      {% for subform in formset_manifiesto.forms %}
-        {{ subform.as_p }}
-
-        {% if subform.instance and subform.instance.archivo %}
-          <p>Archivo actual:
-            <a href="{{ subform.instance.archivo.url }}" target="_blank">
-              {{ subform.instance.archivo.name|slice:"10:" }}
-            </a>
-          </p>
-        {% endif %}
-      {% endfor %}
-
-    </fieldset>
-
-    <button type="submit">
-      {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %}
-    </button>
+    </div>
   </form>
-</body>
-</html>
+</div>
 {% endblock %}
