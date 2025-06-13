@@ -6,7 +6,7 @@ from apps.embarque.models import Embarque, Pais, Puerto
 
 class TipoContenedor(models.Model):
     id_tipo_cont = models.CharField(primary_key=True, max_length=4)
-    nombre_tipo_cont = models.CharField(max_length=50)
+    nombre_tipo_cont = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nombre_tipo_cont
@@ -14,24 +14,24 @@ class TipoContenedor(models.Model):
 
 class TipoCarga(models.Model):
     id_tipo_carga = models.AutoField(primary_key=True)
-    descripcion_tipo_carga = models.CharField(max_length=50)
+    descripcion_tipo_carga = models.CharField(max_length=100)
 
 
     def __str__(self):
         return self.descripcion_tipo_carga
 
-class Equipamiento(models.Model):
+class TipoEquipamiento(models.Model):
     id_equipamiento = models.AutoField(primary_key=True)
-    descripcion_equip = models.CharField(max_length=50)
+    descripcion_equip = models.CharField(max_length=100)
 
     def __str__(self):
         return self.descripcion_equip
 
 class Contenedor(models.Model):
-    id_contenedor = models.CharField(primary_key=True, max_length=11,editable=False)
+    id_contenedor = models.CharField(primary_key=True, max_length=16,editable=False)
     tipo_contenedor = models.ForeignKey(TipoContenedor, on_delete=models.PROTECT, null=True, related_name="tipo_contenedor")
     tipo_carga = models.ForeignKey(TipoCarga, on_delete=models.PROTECT, null=True, related_name="tipo_carga")
-    equipamiento = models.ForeignKey(Equipamiento, on_delete=models.PROTECT, null=True, related_name="equipamiento_contenedor")
+    tipo_equipamiento = models.ForeignKey(TipoEquipamiento, on_delete=models.PROTECT, null=True, related_name="tipo_equipamiento")
     puerto_procedencia = models.ForeignKey(
         Puerto,
         on_delete=models.PROTECT,
@@ -72,7 +72,6 @@ class Contenedor(models.Model):
         if not self.id_contenedor:
             nombre_transportista = self.embarque.nombre_transportista[:3].upper()
             prefijo = f"{nombre_transportista}U"
-            # Bucle para asegurar unicidad
             while True:
                 ultimo = (
                     Contenedor.objects
@@ -81,34 +80,31 @@ class Contenedor(models.Model):
                     .first()
                 )
                 if ultimo:
-                    # Extrae el secuencial del formato ABCU-XXXXXX-X
                     sec = int(ultimo.id_contenedor[5:11]) + 1
                 else:
                     sec = 1
                 sec_str = f"{sec:06d}"
                 digito_control = self._dc(prefijo, sec_str)
                 nuevo_id = f"{prefijo}-{sec_str}-{digito_control}"
-                # Si no existe, lo asigna y sale del bucle
                 if not Contenedor.objects.filter(id_contenedor=nuevo_id).exists():
                     self.id_contenedor = nuevo_id
                     break
         super().save(*args, **kwargs)
 
     def _dc(self, prefijo, sec_str):
-        # dígito de control BIC simplificado
         return sum(map(ord, f"{prefijo}{sec_str}")) % 10
 
     def actualizar_estado(self, save=True):
         docs = self.documentos.all()
 
-        if not docs.exists():                 # sin documentos = sigue igual
+        if not docs.exists():                
             return
 
         if docs.filter(estado_doc=Documento.RECHAZADO).exists():
             nuevo = self.REVOCADO
         elif docs.filter(estado_doc=Documento.PENDIENTE).exists():
             nuevo = self.EN_TRANSITO
-        else:                                 # todos aprobados
+        else:                                 
             nuevo = self.ARRIBADO
 
         if nuevo != self.estado_contenedor:

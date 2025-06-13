@@ -21,14 +21,11 @@ class ContenedorCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
   
 
     def handle_no_permission(self):
-        # Si no es agente de origen, redirigimos o mostramos mensaje
-        return redirect("pages:home")  # Cambia “home” por tu vista de inicio
-    # capturamos el embarque
+        return redirect("pages:home")  
     def dispatch(self, request, *args, **kwargs):
         self.embarque = get_object_or_404(Embarque, pk=kwargs["embarque_pk"])
         return super().dispatch(request, *args, **kwargs)
     
-    # pasamos el embarque al form
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["embarque"] = self.embarque
@@ -39,7 +36,6 @@ class ContenedorCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         context["embarque"] = self.embarque
         return context
     
-    # ponemos FK + puerto de procedencia antes de guardar
     def form_valid(self, form):
         form.instance.embarque          = self.embarque
         form.instance.puerto_procedencia = self.embarque.puerto_procedencia
@@ -54,15 +50,13 @@ class ContenedorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     form_class    = ContenedorForm
     template_name = "contenedores/contenedor_form.html"
     def test_func(self):
-        # Solo permitimos editar si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
     def handle_no_permission(self):
-        # Si no es agente de origen, redirigimos o mostramos mensaje
-        return redirect("pages:home")  # Cambia “home” por tu vista de inicio
+        return redirect("pages:home") 
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["embarque"] = self.object.embarque  # pasamos el embarque al form
+        kwargs["embarque"] = self.object.embarque  
         return kwargs
     
     def get_context_data(self, **kwargs):
@@ -80,13 +74,11 @@ class ContenedorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = "contenedores/contenedor_confirm_delete.html"
 
     def test_func(self):
-        # Solo permitimos eliminar si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
     def handle_no_permission(self):
         return redirect("pages:home")
     def get_success_url(self):
-        return reverse("embarque_list")  # Volvemos a la lista de embarques tras eliminar el contenedor
-
+        return reverse("embarque_list")  
     
 class MercanciaManageView(CreateView):
     """Alta de mercancía + tabla de las existentes."""
@@ -95,7 +87,6 @@ class MercanciaManageView(CreateView):
     template_name = "contenedores/mercancia_manage.html"
 
     def test_func(self):
-        # Solo permitimos acceder a esta vista si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
 
     def handle_no_permission(self):
@@ -105,20 +96,17 @@ class MercanciaManageView(CreateView):
         self.contenedor = get_object_or_404(Contenedor, pk=kwargs["contenedor_pk"])
         return super().dispatch(request, *args, **kwargs)
 
-    # pasamos el contenedor al form
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["contenedor"] = self.contenedor
         return kwargs
 
-    # tabla en el contexto
     def get_context_data(self, **ctx):
         ctx = super().get_context_data(**ctx)
         ctx["contenedor"] = self.contenedor
         ctx["mercancias"] = self.contenedor.mercancias.select_related("bulto", "pais")
         return ctx
 
-    # tras registrar, volvemos a la misma pantalla
     def get_success_url(self):
         return reverse("mercancia_manage", args=[self.contenedor.pk])
     
@@ -129,7 +117,6 @@ class MercanciaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = "contenedores/mercancia_form.html"
 
     def test_func(self):
-        # Solo permitimos editar si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
 
     def handle_no_permission(self):
@@ -151,7 +138,6 @@ class MercanciaDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = "contenedores/mercancia_confirm_delete.html"
 
     def test_func(self):
-        # Solo permitimos eliminar si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
 
     def handle_no_permission(self):
@@ -165,7 +151,6 @@ class DocumentManageView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "contenedores/documentos_manage.html"
 
     def test_func(self):
-        # Solo permitimos acceder a esta vista si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
 
     def handle_no_permission(self):
@@ -173,7 +158,6 @@ class DocumentManageView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.contenedor = get_object_or_404(Contenedor, pk=kwargs["contenedor_pk"])
-        # Validar que haya al menos una mercancía
         if not self.contenedor.mercancias.exists():
             messages.error(request, "Debes registrar al menos una mercancía antes de continuar.")
             return redirect("mercancia_manage", contenedor_pk=self.contenedor.pk)
@@ -217,8 +201,7 @@ class DocumentManageView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         
 
     def handle_no_permission(self):
-        # Si no es agente de origen, redirigimos o mostramos mensaje
-        return redirect("pages:home")  # Cambia “home” por tu vista de inicio
+        return redirect("pages:home")  
 
 class DocumentoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model         = Documento
@@ -226,7 +209,6 @@ class DocumentoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = "contenedores/documento_form.html"
 
     def test_func(self):
-        # Solo permitimos editar si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
 
     def handle_no_permission(self):
@@ -235,7 +217,6 @@ class DocumentoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["contenedor"] = self.object.contenedor
-        # tipo_fijo si es de los “únicos”
         kwargs["tipo_fijo"]  = self.object.tipo_documento_id if self.object.tipo_documento_id in (1,2,3) else None
         return kwargs
 
@@ -248,7 +229,6 @@ class DocumentoDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = "contenedores/documento_confirm_delete.html"
 
     def test_func(self):
-        # Solo permitimos eliminar si el usuario es “Agente de origen”
         return self.request.user.is_authenticated and self.request.user.is_origen
     
     def handle_no_permission(self):
@@ -278,14 +258,12 @@ class ContenedorDestinoListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         )
     
 
-# apps/contenedor/views.py
 @login_required
 @require_POST
 def documento_validar(request, pk):
     doc  = get_object_or_404(Documento, pk=pk)
     user = request.user
 
-    # ─── seguridad ──────────────────────────────────────────
     if not (user.is_destino and doc.contenedor.puerto_descarga == user.puerto):
         messages.error(request, "Sin permisos.")
         return redirect("pages:home")
@@ -293,7 +271,6 @@ def documento_validar(request, pk):
     accion      = request.POST.get("accion")           # 'aprobar' | 'rechazar' | 'pendiente'
     comentario  = request.POST.get("comentario", "").strip()
 
-    # ─── decide nuevo estado ───────────────────────────────
     if accion == "aprobar":
         nuevo_estado = Documento.APROBADO
         doc.validado_por = user
@@ -305,20 +282,17 @@ def documento_validar(request, pk):
         doc.validado_por = user
     elif accion == "pendiente":
         nuevo_estado = Documento.PENDIENTE
-        doc.validado_por = None  # Limpiar quién validó si vuelve a pendiente
+        doc.validado_por = None  
     else:
         messages.error(request, "Acción inválida.")
         return redirect("embarque_detail", pk=doc.contenedor.embarque.pk)
 
-    # ─── actualiza y guarda ────────────────────────────────
     doc.estado_doc = nuevo_estado
     doc.comentario = comentario if nuevo_estado == Documento.RECHAZADO else ""
     doc.validado_por = user if nuevo_estado in [Documento.APROBADO, Documento.RECHAZADO] else None
     doc.save(update_fields=["estado_doc", "comentario"])
-    # 1. Actualiza el estado del contenedor primero
     doc.contenedor.actualizar_estado()
 
-    # 2. Luego actualiza el puerto actual del embarque
     embarque = doc.contenedor.embarque
     embarque.actualizar_puerto_actual()
 

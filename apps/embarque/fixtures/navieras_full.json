@@ -1,0 +1,359 @@
+[
+  
+  {
+    "model": "embarque.pais",
+    "pk": "CN",
+    "fields": { "nombre_pais": "China" }
+  },
+  {
+    "model": "embarque.pais",
+    "pk": "SG",
+    "fields": { "nombre_pais": "Singapur" }
+  },
+  {
+    "model": "embarque.pais",
+    "pk": "NL",
+    "fields": { "nombre_pais": "Países Bajos" }
+  },
+  {
+    "model": "embarque.pais",
+    "pk": "US",
+    "fields": { "nombre_pais": "Estados Unidos" }
+  },
+  {
+    "model": "embarque.pais",
+    "pk": "BR",
+    "fields": { "nombre_pais": "Brasil" }
+  },
+
+  
+  {
+    "model": "embarque.puerto",
+    "pk": "CN001",
+    "fields": { "pais": "CN", "nombre_puerto": "Puerto de Shanghái" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "SG001",
+    "fields": { "pais": "SG", "nombre_puerto": "Puerto de Singapur" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "NL001",
+    "fields": { "pais": "NL", "nombre_puerto": "Puerto de Rotterdam" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "US001",
+    "fields": { "pais": "US", "nombre_puerto": "Puerto de Los Ángeles" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "US002",
+    "fields": { "pais": "US", "nombre_puerto": "Puerto de Long Beach" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "US003",
+    "fields": { "pais": "US", "nombre_puerto": "Puerto de Seattle" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "BR001",
+    "fields": { "pais": "BR", "nombre_puerto": "Puerto de Santos" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "US004",
+    "fields": { "pais": "US", "nombre_puerto": "Puerto de Nueva York" }
+  },
+
+  
+  {
+    "model": "embarque.ruta",
+    "pk": 1,
+    "fields": { "nombre_ruta": "Asia – Europa – América" }
+  },
+  {
+    "model": "embarque.ruta",
+    "pk": 2,
+    "fields": { "nombre_ruta": "Transpacífica" }
+  },
+  {
+    "model": "embarque.ruta",
+    "pk": 3,
+    "fields": { "nombre_ruta": "Atlántico Norte" }
+  },
+
+ 
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  1,
+    "fields": { "ruta": 1, "puerto": "CN001", "orden_ruta": 1 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  2,
+    "fields": { "ruta": 1, "puerto": "SG001", "orden_ruta": 2 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  3,
+    "fields": { "ruta": 1, "puerto": "NL001", "orden_ruta": 3 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  4,
+    "fields": { "ruta": 1, "puerto": "US001", "orden_ruta": 4 }
+  },
+
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  5,
+    "fields": { "ruta": 2, "puerto": "CN001", "orden_ruta": 1 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  6,
+    "fields": { "ruta": 2, "puerto": "US002", "orden_ruta": 2 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  7,
+    "fields": { "ruta": 2, "puerto": "US003", "orden_ruta": 3 }
+  },
+
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  8,
+    "fields": { "ruta": 3, "puerto": "BR001", "orden_ruta": 1 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk":  9,
+    "fields": { "ruta": 3, "puerto": "NL001", "orden_ruta": 2 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk": 10,
+    "fields": { "ruta": 3, "puerto": "US004", "orden_ruta": 3 }
+  },
+  {
+    "model": "embarque.buque",
+    "pk": "CN0001",
+    "fields": {
+      "pais": "CN",
+      "nombre_buque": "COSCO Galaxy"
+    }
+  },
+  {
+    "model": "embarque.buque",
+    "pk": "SG0001",
+    "fields": {
+      "pais": "SG",
+      "nombre_buque": "Singapore Trader"
+    }
+  },
+  {
+    "model": "embarque.buque",
+    "pk": "NL0001",
+    "fields": {
+      "pais": "NL",
+      "nombre_buque": "Rotterdam Express"
+    }
+  },
+  {
+    "model": "embarque.buque",
+    "pk": "US0001",
+    "fields": {
+      "pais": "US",
+      "nombre_buque": "Liberty Belle"
+    }
+  },
+  {
+    "model": "embarque.buque",
+    "pk": "BR0001",
+    "fields": {
+      "pais": "BR",
+      "nombre_buque": "Santos Carrier"
+    }
+  },
+
+  {
+    "model": "contenedor.tipocontenedor",
+    "pk": "40GP",
+    "fields": {
+      "nombre_tipo_cont": "40x8 propósito general, no ventilado"
+    }
+  },
+  {
+    "model": "contenedor.tipocontenedor",
+    "pk": "40H5",
+    "fields": {
+      "nombre_tipo_cont": "40x8 térmico aislado, K=0.4 W (m·K)"
+    }
+  },
+  {
+    "model": "contenedor.tipocontenedor",
+    "pk": "40R1",
+    "fields": {
+      "nombre_tipo_cont": "40x8 térmico, refrigerado mecánicamente y climatizado"
+    }
+  },
+  {
+    "model": "contenedor.tipocontenedor",
+    "pk": "40P1",
+    "fields": {
+      "nombre_tipo_cont": "40x8 plataforma, extremos fijos completos"
+    }
+  },
+  {
+    "model": "contenedor.tipocontenedor",
+    "pk": "40BK",
+    "fields": {
+      "nombre_tipo_cont": "40x8 a granel seco, presurizado"
+    }
+  },
+
+  {
+    "model": "contenedor.tipocarga",
+    "pk": 1,
+    "fields": {
+      "descripcion_tipo_carga": "Documentos"
+    }
+  },
+  {
+    "model": "contenedor.tipocarga",
+    "pk": 2,
+    "fields": {
+      "descripcion_tipo_carga": "Envíos de bajo valor no sujetos a impuestos"
+    }
+  },
+  {
+    "model": "contenedor.tipocarga",
+    "pk": 9,
+    "fields": {
+      "descripcion_tipo_carga": "Contenerizada"
+    }
+  },
+  {
+    "model": "contenedor.tipocarga",
+    "pk": 11,
+    "fields": {
+      "descripcion_tipo_carga": "Carga peligrosa"
+    }
+  },
+  {
+    "model": "contenedor.tipocarga",
+    "pk": 12,
+    "fields": {
+      "descripcion_tipo_carga": "Carga general"
+    }
+  },
+
+  {
+    "model": "contenedor.tipoequipamiento",
+    "pk": 6,
+    "fields": {
+      "descripcion_equip": "Tanque presurizado"
+    }
+  },
+  {
+    "model": "contenedor.tipoequipamiento",
+    "pk": 7,
+    "fields": {
+      "descripcion_equip": "Tanque refrigerado"
+    }
+  },
+  {
+    "model": "contenedor.tipoequipamiento",
+    "pk": 9,
+    "fields": {
+      "descripcion_equip": "Tanque de acero inoxidable"
+    }
+  },
+  {
+    "model": "contenedor.tipoequipamiento",
+    "pk": 10,
+    "fields": {
+      "descripcion_equip": "Contenedor refrigerado de 40 pies sin funcionar"
+    }
+  },
+  {
+    "model": "contenedor.tipoequipamiento",
+    "pk": 14,
+    "fields": {
+      "descripcion_equip": "Trailer"
+    }
+  },
+
+  {
+    "model": "contenedor.tipodocumento",
+    "pk": 1,
+    "fields": {
+      "nombre_tipo_doc": "Bill of Lading"
+    }
+  },
+  {
+    "model": "contenedor.tipodocumento",
+    "pk": 2,
+    "fields": {
+      "nombre_tipo_doc": "Factura"
+    }
+  },
+  {
+    "model": "contenedor.tipodocumento",
+    "pk": 3,
+    "fields": {
+      "nombre_tipo_doc": "Certificado de Origen"
+    }
+  },
+  {
+    "model": "contenedor.tipodocumento",
+    "pk": 4,
+    "fields": {
+      "nombre_tipo_doc": "Soporte"
+    }
+  },
+
+  {
+    "model": "contenedor.bulto",
+    "pk": 1,
+    "fields": {
+      "clase_bulto": "Caja",
+      "peso_bulto": 15.23
+    }
+  },
+  {
+    "model": "contenedor.bulto",
+    "pk": 2,
+    "fields": {
+      "clase_bulto": "Pallet",
+      "peso_bulto": 18.14
+    }
+  },
+  {
+    "model": "contenedor.bulto",
+    "pk": 3,
+    "fields": {
+      "clase_bulto": "Saco",
+      "peso_bulto": 19.14
+    }
+  },
+  {
+    "model": "contenedor.bulto",
+    "pk": 4,
+    "fields": {
+      "clase_bulto": "Tambor",
+      "peso_bulto": 30.15
+    }
+  },
+  {
+    "model": "contenedor.bulto",
+    "pk": 5,
+    "fields": {
+      "clase_bulto": "Bolsa",
+      "peso_bulto": 16.7
+    }
+  }
+]

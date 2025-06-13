@@ -27,7 +27,7 @@ class Puerto(models.Model):
         on_delete=models.PROTECT,
         related_name="puertos",
     )
-    nombre_puerto = models.CharField(max_length=20)
+    nombre_puerto = models.CharField(max_length=50)
 
     PAD = 3                    # cantidad de dígitos ➜ 001, 002, ...
 
@@ -55,7 +55,7 @@ class Puerto(models.Model):
 
 class Ruta(models.Model):
     id_ruta = models.AutoField(primary_key=True)
-    nombre_ruta = models.CharField(max_length=20)
+    nombre_ruta = models.CharField(max_length=50)
     puertos = models.ManyToManyField(
         "Puerto",
         through="SegmentoRuta",
@@ -220,7 +220,6 @@ class Embarque(models.Model):
             if seg.puerto == self.puerto_actual:
                 break
         else:
-            # Si el puerto_actual no está en la ruta, considera 0 transitados
             transitados = 0
         return (transitados, total)
         
@@ -239,7 +238,7 @@ class Embarque(models.Model):
                 return False
         return self.contenedores.exists()
  
-    PAD = 4  # Cantidad de dígitos para el consecutivo en el ID (ej. 0001)
+    PAD = 4  
 
     def __str__(self):
         return self.id_embarque or "(sin ID)"
@@ -354,26 +353,20 @@ class ManifiestoCarga(models.Model):
 class Escala(models.Model):
     puerto = models.ForeignKey(Puerto, on_delete=models.PROTECT, related_name="escalas")
     embarque = models.ForeignKey(Embarque, on_delete=models.CASCADE, related_name="escalas")
-    # el usuario NO lo edita directamente
     orden_escala = models.PositiveIntegerField(editable=False)
 
     class Meta:
         unique_together = ("embarque", "orden_escala")
         ordering = ["orden_escala"]
 
-    # ---------------------------
-    # a)  validación + asignación
-    # ---------------------------
     def clean(self):
         """
         Ajusta orden_escala al valor de orden_ruta
         que le corresponde al (ruta, puerto).
         """
-        # 1. Asegúrate de que Embarque tenga ruta
         if not self.embarque or not self.embarque.ruta:
             raise ValidationError("El embarque debe tener una ruta asignada.")
 
-        # 2. Busca el segmento
         try:
             seg = SegmentoRuta.objects.get(
                 ruta=self.embarque.ruta,
@@ -385,14 +378,9 @@ class Escala(models.Model):
                 f"no pertenece a la ruta {self.embarque.ruta}."
             )
 
-        # 3. Copia el orden
         self.orden_escala = seg.orden_ruta
 
-    # ---------------------------
-    # b)  por si quieres más control
-    # ---------------------------
     def save(self, *args, **kwargs):
-        # Llama a clean() para garantizar la sincronía
         self.clean()
         super().save(*args, **kwargs)
 
