@@ -1,11 +1,16 @@
 {# templates/registration/login_destino.html #}
 {% extends "base.html" %}
+{% load widget_tweaks %}
 {% block title %}Iniciar Sesión – Agente Destino{% endblock %}
 
 {% block content %}
-  <h2>Login – Agente Aduanal (Puerto de Destino)</h2>
+  
+  <div class="login-card text-white  justify-content-center formContainer mt-5 ">
+    <h2 class="text-center">Login</h2>
+    <h3 class="text-center">Agente Aduanal</h3>
+    <h4 class="text-center">(Puerto de Destino)</h4>
 
-  <form method="post" novalidate>
+      <form method="post" novalidate>
     {% csrf_token %}
 
     {{ form.non_field_errors }}
@@ -23,12 +28,13 @@
       {% if form.password.errors %}
         <div class="error">{{ form.password.errors }}</div>
       {% endif %}
+    </div>    
+
+      <button type="submit" class="btn btn-primary customBtn ">Ingresar</button>    
+    </form>
     </div>
-
-    <button type="submit" class="btn btn-primary">Ingresar</button>
-  </form>
-
-  <p style="margin-top:20px;">
-    <a href="{% url 'pages:home' %}">← Volver a la página de inicio</a>
-  </p>
+  
+<div class="text-center mt-3">
+ <a href="{% url 'pages:home' %}" class="custom-return-link">← Volver a la página de inicio</a>
+</div>
 {% endblock %}
