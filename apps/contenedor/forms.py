@@ -138,7 +138,7 @@ class DocumentoForm(forms.ModelForm):
 
         if self.cleaned_data.get("archivo"):
             name = self.cleaned_data["archivo"].name.lower()
-            allowed = {".pdf", ".jpg", ".jpeg", ".png"}
+            allowed = {".pdf"}
             if not any(name.endswith(ext) for ext in allowed):
                 self.add_error("archivo", "El formato de archivo no está permitido.")
         return cleaned

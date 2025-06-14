@@ -235,32 +235,48 @@ def embarque_enviar(request, pk):
 
     
 
-# apps/embarques/views.py
 @login_required
 def manifiesto_validar(request, pk):
     mc   = get_object_or_404(ManifiestoCarga, pk=pk)
     user = request.user
 
-    if not (user.is_destino and
-            mc.embarque.ruta.puertos.filter(pk=user.puerto.pk).exists()):
+    # 1 ▸ Permisos
+    if not (user.is_destino and mc.embarque.ruta.puertos.filter(pk=user.puerto.pk).exists()):
         messages.error(request, "Sin permisos para validar este manifiesto.")
         return redirect("pages:home")
 
     accion = request.POST.get("accion")
+
+    # 2 ▸ Gestión de estados del manifiesto
     if accion == "aprobar":
-        mc.estado_mc, mc.validado_por = ManifiestoCarga.APROBADO, user
+        mc.estado_mc = ManifiestoCarga.APROBADO
     elif accion == "denegar":
-        mc.estado_mc, mc.validado_por = ManifiestoCarga.DENEGADO, user
+        mc.estado_mc = ManifiestoCarga.DENEGADO
+    elif accion == "seguir":                       # ← NUEVA ACCIÓN
+        if mc.estado_mc != ManifiestoCarga.APROBADO:
+            messages.error(request, "El manifiesto debe estar aprobado antes de seguir la ruta.")
+            return redirect("embarque_detail", pk=mc.embarque.pk)
+        # No cambiamos estado_mc; solo avanzamos el puerto.
     else:
         messages.error(request, "Acción inválida.")
         return redirect("embarque_detail", pk=mc.embarque.pk)
 
-    mc.save(update_fields=["estado_mc", "validado_por"])
+    # Guardamos el manifiesto solo si cambió el estado
+    if accion in ("aprobar", "denegar"):
+        mc.save(update_fields=["estado_mc"])
 
+    # 3 ▸ Actualizar puerto_actual y orden_actual
     embarque = mc.embarque
     if embarque.puerto_actual != user.puerto:
-        embarque.puerto_actual = user.puerto
-        embarque.save(update_fields=["puerto_actual"])
+        # listado de puertos en orden para fijar orden_actual
+        segmento_ids = list(
+            embarque.ruta.segmentos.order_by("orden_ruta")
+                    .values_list("puerto_id", flat=True)
+        )
+        if user.puerto_id in segmento_ids:
+            embarque.puerto_actual = user.puerto
+            embarque.orden_actual  = segmento_ids.index(user.puerto_id) + 1  # 1-based
+            embarque.save(update_fields=["puerto_actual", "orden_actual"])
 
     messages.success(request, "Manifiesto actualizado correctamente.")
     return redirect("embarque_detail", pk=embarque.pk)
