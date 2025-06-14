@@ -97,6 +97,7 @@ class Buque(models.Model):
     def __str__(self):
         return self.nombre_buque
 
+# apps/embarque/models.py
 class Embarque(models.Model):
     id_embarque = models.CharField(primary_key=True, max_length=7, editable=False)
 
@@ -327,7 +328,7 @@ class ManifiestoCarga(models.Model):
     def __str__(self):
         return self.nombre_mc
     DENEGADO = "Denegado"
-    APROBADO = "Aprobado"   
+    APROBADO = "Aprobado"  
     ESTADOS = [
         (DENEGADO, "Denegado"),
         (APROBADO, "Aprobado"),
@@ -338,16 +339,6 @@ class ManifiestoCarga(models.Model):
         default=DENEGADO,
         help_text="Estado del manifiesto de carga"
     )
-    validado_por = models.ForeignKey(
-        CustomUser,
-        on_delete=models.CASCADE,
-        related_name="manifiestos_validacion",
-        null=True,
-        blank=True,
-        help_text="Usuario que validó el manifiesto"
-    )
-    
-    
 
 
 class Escala(models.Model):

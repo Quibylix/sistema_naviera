@@ -257,6 +257,7 @@ class ContenedorDestinoListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             .select_related("embarque")
         )
     
+#apps/contenedor/views.py
 
 @login_required
 @require_POST

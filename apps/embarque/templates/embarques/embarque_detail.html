@@ -233,6 +233,15 @@ a:hover {
             <button>Rechazar</button>
           </form>
           {% endif %}
+          {# ▸ NUEVO botón Seguir Ruta — solo si ya está aprobado y aún no se ha registrado este puerto #}
+          {% if embarque.manifiesto_carga.estado_mc == 'Aprobado' and embarque.puerto_actual != user.puerto %}
+            <form action="{% url 'manifiesto_validar' embarque.manifiesto_carga.pk %}"
+                  method="post" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="accion" value="seguir">
+              <button>Seguir ruta</button>
+            </form>
+          {% endif %}
         </td>
         {% endif %}
         <td>—</td>
