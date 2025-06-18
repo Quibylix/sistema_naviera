@@ -1,10 +1,19 @@
 {% extends "base.html" %}
+{% load static widget_tweaks %}
+{# Enlace CSS específico para este form #}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/mercancia_form.css' %}">
+{% endblock %}
 {% block content %}
 <h2>Editar mercancía {{ object.pk }}</h2>
+<div class="divv">
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Guardar cambios</button>
   <a href="{% url 'mercancia_manage' object.contenedor.pk %}">Cancelar</a>
 </form>
+
+</div>
+
 {% endblock %}

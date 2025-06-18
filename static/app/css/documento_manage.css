@@ -1,0 +1,224 @@
+/* documento_form.css */
+
+/* ===== Contenedor global del formulario ===== */
+form {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+.border{
+    background: #f8f9fa;
+    border: 1px solid #1b2a49 !important;
+    padding: 1rem;
+}
+
+/* Borde para los textbox del formulario */
+.field-row input[type="text"] {
+  border: 2px solid #1b2a49;    /* borde azul marino */
+  border-radius: 0.25rem;        /* esquinas redondeadas */
+  padding: 0.5rem;               /* espacio interno */
+  outline: none;                 /* quita el outline por defecto */
+  transition: border-color 0.2s; /* animación suave al enfocar */
+}
+
+/* Cambio de color de borde al enfocar */
+.field-row input[type="text"]:focus {
+  border-color: #163345;         /* azul más oscuro al enfocar */
+}
+
+
+/* Cada fila de campo como línea con etiqueta + control */
+.field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Etiquetas */
+.field-row label {
+  flex: 0 0 140px;          /* ancho fijo para todas las etiquetas */
+  font-weight: bold;
+  color: #1b2a49;
+}
+
+/* Inputs de texto, selects, textareas */
+.field-row input[type="text"],
+.field-row select,
+.field-row textarea {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+}
+
+/* Input file personalizado */
+.field-row input[type="file"] {
+  flex: 1;
+}
+.field-row input[type="file"]::-webkit-file-upload-button {
+  background-color: #1b2a49;
+  color: #fff;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+/* Mensajes de error bajo el control */
+.field-row .error {
+  flex: 1;
+  color: #c00;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* ===== Botones al final ===== */
+.btn-save,
+.btn-delete {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+/* Guardar */
+.btn-save {
+  background-color: #1b2a49;
+  color: #fff;
+  border: none;
+  float: right;
+}
+.btn-save:hover {
+  background-color: #fff;
+  color: #1b2a49;
+  border-color:1px solid #1b2a49 !important;
+}
+
+/* Cancelar */
+.btn-delete {
+  background-color: #e0e0e0;
+  color: #333;
+  border: 1px solid #ccc;
+  float: right;
+}
+.btn-delete:hover {
+  background-color: #d5d5d5;
+}
+
+/* Limpia floats si hace falta */
+form::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* ===== Estilo para tabla de resumen ===== */
+.table-summary {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+}
+
+.table-summary th,
+.table-summary td {
+  border: 1px solid #ccc;
+  padding: 0.6rem;
+  text-align: left;
+}
+
+.table-summary th {
+  background-color: #1b2a49;
+  color: #fff;
+  font-weight: normal;
+}
+
+.table-summary tr:nth-child(even) {
+  background-color: #eef2f7;
+}
+
+
+/* ===== Estilos para la tabla de Resumen Global ===== */
+h3 {
+  color: #1b2a49;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-bottom: 2rem;
+}
+
+table th,
+table td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+/* Encabezado */
+table th {
+  background-color: #1b2a49;
+  color: #fff;
+  font-weight: normal;
+}
+
+/* Filas alternadas */
+table tr:nth-child(even) {
+  background-color: #f1f4f8;
+}
+
+/* Enlaces dentro de la celda de Archivo */
+table td a {
+  color: #1b2a49;
+  text-decoration: none;
+}
+table td a:hover {
+  text-decoration: underline;
+}
+
+/* Botones de acción */
+.btn-edit,
+.btn-delete {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Editar */
+.btn-edit {
+  background-color: #1b2a49 !important;
+  color: #fff !important;
+  border: none;
+}
+.btn-edit:hover {
+  background-color: #163345;
+}
+
+/* Eliminar */
+.btn-delete {
+  background-color: #e0e0e0 !important;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.btn-delete:hover {
+  background-color: #d5d5d5;
+}
+
+/* Mensaje “sin documentos” */
+table tr td[colspan="5"] {
+  padding: 1.5rem;
+  font-style: italic;
+  color: #666;
+}
+

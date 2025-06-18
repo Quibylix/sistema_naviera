@@ -3,7 +3,7 @@
 {% load static %}
 {% block title %}Embarques{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/embarque_list.css' %}">
+<link rel="stylesheet" href="{% static 'app/css/embarque_list.css' %}">
 {% endblock %}
 {% block content %}
 
@@ -68,7 +68,7 @@
 
           {# ───── ACCIONES según rol/estado ───── #}
           <td class="col-acciones text-center">
-            <nav class="d-flex justify-content-center gap-2 flex-wrap" aria-label="Acciones">
+            <nav class="d-flex justify-content-center gap-2 flex-nowrap" aria-label="Acciones">
               <a href="{% url 'embarque_detail' e.pk %}" class="text-info" title="Ver detalle">
                 <i class="bi bi-info-circle-fill"></i>
               </a>
@@ -85,10 +85,10 @@
                 {% if e.puede_enviar %}
                 <form action="{% url 'embarque_enviar' e.pk %}" method="post" class="d-inline form-enviar" data-id="{{ e.pk }}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-link p-0 text-success btn-enviar" title="Enviar">
+                <button type="submit" class="btn btn-link p-0 text-success btn-enviar flex-nowrap" title="Enviar">
                   <i class="bi bi-send"></i>
                 </button>
-              </form>
+                </form>
                 {% else %}
                 <span class="text-muted" title="Debe haber al menos un contenedor con mercancías y documentos completos">
                   <i class="bi bi-send"></i>
