@@ -1,29 +1,66 @@
 {% extends "base.html" %}
+{% load static widget_tweaks %}
+{# Enlace CSS específico para este form #}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/mercancia_manage.css' %}">
+{% endblock %}
 {% block content %}
   <h2>Mercancías del contenedor {{ contenedor.pk }}</h2>
 
-  <form method="post">
+  <div class="border">
+
+     <form method="post">
     {% csrf_token %}
     {{ form.non_field_errors }}
-    <table>
-      <tr><th>Descripción</th><td>{{ form.descripcion_mercancia }}</td></tr>
-      <tr><th>Cantidad de bultos</th><td>{{ form.cantidad_bultos }}</td></tr>
-      <tr><th>Clase de bultos</th><td>{{ form.bulto }}</td></tr>
-      <tr><th>País de origen</th><td>{{ form.pais }}</td></tr>
-    </table>
-    <button type="submit">Agregar Mercancía</button>
 
-    {% if mercancias %}
-      <a class="btn btn-primary" href="{% url 'documentos_manage' contenedor.pk %}">
-        Siguiente ➜
-      </a>
-    {% else %}
-      <button class="btn btn-secondary" disabled title="Agrega al menos una mercancía">
-        Siguiente ➜
+    <!-- GRID DE CAMPOS -->
+    <div class="grid-mercancia">
+      <div class="item descripcion">
+        <label for="{{ form.descripcion_mercancia.id_for_label }}">Descripción</label>
+        {{ form.descripcion_mercancia }}
+      </div>
+      <div class="item cantidad">
+        <label for="{{ form.cantidad_bultos.id_for_label }}">Cantidad de bultos</label>
+        {{ form.cantidad_bultos }}
+      </div>
+      <div class="item bulto">
+        <label for="{{ form.bulto.id_for_label }}">Clase de bultos</label>
+        {{ form.bulto }}
+      </div>
+      <div class="item pais">
+        <label for="{{ form.pais.id_for_label }}">País de origen</label>
+        {{ form.pais }}
+      </div>
+    </div>
+
+    <!-- WRAPPER PARA LOS BOTONES -->
+    <div class="form-actions">
+      <button type="submit" class="btn btnn">
+        Agregar Mercancía
       </button>
-      <p class="text-danger mt-2">Debes añadir al menos una mercancía antes de continuar.</p>
+
+      {% if mercancias %}
+        <a class="btn btnn" href="{% url 'documentos_manage' contenedor.pk %}">
+          Siguiente ➜
+        </a>
+      {% else %}
+        <button class="btn btnn" disabled>
+          Siguiente ➜
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- MENSAJE DE ERROR -->
+    {% if not mercancias %}
+      <p class="text-danger mt-2 text-center">
+        Debes añadir al menos una mercancía antes de continuar.
+      </p>
     {% endif %}
   </form>
+
+  </div>
+
+  
 
   <hr>
 
@@ -43,8 +80,8 @@
         <td>{{ m.peso_bruto|default:"—" }}</td>
         <td>
           {% if user.is_origen and m.contenedor.embarque.estado == 'borrador' %}
-            <a href="{% url 'mercancia_edit' m.pk %}">Editar</a>
-            <a href="{% url 'mercancia_delete' m.pk %}">Eliminar</a>
+            <a href="{% url 'mercancia_edit' m.pk %}" class="btn btn-sm btn_tab me-1">Editar</a>
+            <a href="{% url 'mercancia_delete' m.pk %}" class="btn btn-sm btn_tab me-1">Eliminar</a>
           {% endif %}
         </td>
       </tr>

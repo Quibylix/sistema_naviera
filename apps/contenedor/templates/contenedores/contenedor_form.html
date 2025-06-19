@@ -1,15 +1,25 @@
-<!-- templates/contenedores/contenedor_form.html -->
 {% extends "base.html" %}
+{% load static widget_tweaks %}
+{# Enlace CSS específico para este form #}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/contenedor_form.css' %}">
+{% endblock %}
 {% block content %}
-<h2>Crear contenedor para embarque {{ embarque.id_embarque }}</h2>
+<h2 class="text-center mb-4">Crear contenedor para embarque {{ embarque.id_embarque }}</h2>
+ 
+<div class="border">
 
 <form method="post">
+  <p><strong>Puerto origen:</strong> {{ embarque.puerto_procedencia }}</p>
   {% csrf_token %}
   {{ form.as_p }}
 
-  <button class="btn btn-primary">Guardar</button>
- <p><strong>Puerto origen:</strong> {{ embarque.puerto_procedencia }}</p>
-
-  <a class="btn btn-secondary" href="{% url 'embarque_list' %}">Cancelar</a>
+   <div class="form-buttons">
+  <button class="btn btn-guardar">Guardar</button>
+  <a    class="btn btn-cancelar" href="{% url 'embarque_list' %}">Cancelar</a>
+</div>
 </form>
+</div>
+
+
 {% endblock %}

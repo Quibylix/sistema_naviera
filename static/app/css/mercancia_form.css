@@ -1,0 +1,122 @@
+/* ===== contenedor_form.css ===== */
+
+/* —— Título —— */
+h2 {
+  font-size: 2rem;
+  color: #1b2a49;
+  margin-bottom: 1rem;
+}
+
+/* —— Contenedor fluido en 3 columnas —— */
+form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  
+}
+
+.divv{
+    width: 100%;
+    margin: 0 auto 2rem;
+    padding: 1rem;
+    border: 1px solid #1b2a49;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+}
+
+/* —— “Descripción” ocupa toda la primera fila —— */
+form p:nth-of-type(1) {
+  grid-column: 1 / -1;
+}
+
+/* —— Cada párrafo en columna vertical —— */
+form p {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* —— Etiqueta encima del control —— */
+form p label {
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+  color: #1b2a49;
+}
+
+/* —— Inputs, selects y textarea al 100% de su celda —— */
+form p input,
+form p select,
+form p textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease-in-out;
+}
+
+/* —— Borde de enfoque —— */
+form p input:focus,
+form p select:focus,
+form p textarea:focus {
+  outline: none;
+  border-color: #1b2a49;
+}
+
+/* —— Botones en la fila 3 —— */
+form > button,
+form > a {
+  grid-row: 3;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* —— “Cancelar” en columna 2 —— */
+form > a {
+  grid-column: 3;
+  justify-self: end;
+  margin-left: 0.25rem;           /* más cerca del botón Guardar */
+  background-color: #6c757d;      /* color personalizado */
+  color: #fff;
+  border: 1px solid #6c757d;
+  text-decoration: none;
+}
+
+/* —— “Guardar cambios” en columna 3 —— */
+form > button {
+  grid-column: 3;
+  justify-self:center;
+  background-color: #1b2a49;      /* color personalizado */
+  color: #fff;
+  border: none;
+}
+
+/* —— Efectos hover —— */
+form > a:hover {
+  background-color: #5a6268;
+}
+form > button:hover {
+  background-color: #163345;
+}
+
+/* —— Móvil: una columna y botones full-width —— */
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr;
+  }
+  form p:nth-of-type(1) {
+    grid-column: 1;
+  }
+  form > a,
+  form > button {
+    grid-row: auto;
+    grid-column: 1;
+    justify-self: stretch;
+    text-align: center;
+    margin-left: 0;
+  }
+}

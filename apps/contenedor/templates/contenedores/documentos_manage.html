@@ -1,16 +1,17 @@
-{# templates/contenedores/documentos_manage.html #}
 {% extends "base.html" %}
-{% load static %}
-
+{% load static widget_tweaks %}
+{# Enlace CSS específico para este form #}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/documento_manage.css' %}">
+{% endblock %}
 {% block content %}
   <h2>Documentación del contenedor {{ contenedor.pk }}</h2>
 
-
-  <section>
+  <section class="border">
     <h3>1. Bill of Lading</h3>
 
     {% if docs_bol %}
-      <table>
+      <table >
         <tr>
           <th>Nombre</th>
           <th>Archivo</th>
@@ -75,7 +76,7 @@
 
   <hr>
 
-  <section>
+  <section class="border">
     <h3>2. Factura de Exportación</h3>
 
     
@@ -120,7 +121,7 @@
 
   <hr>
 
-  <section>
+  <section class="border">
     <h3>3. Certificado de Origen</h3>
 
     {% if docs_cert %}
@@ -192,7 +193,7 @@
   {# ------------------------------------------------ #}
   {#        4) DOCUMENTOS DE SOPORTE (tipo_documento=4)  #}
   {# ------------------------------------------------ #}
-  <section>
+  <section class="border" >
   <h3>4. Documentos de Soporte</h3>
 
   {# Formulario para crear “Soporte” siempre visible #}
@@ -233,10 +234,11 @@
       {% endif %}
     </div>
 
-    <button type="submit" class="btn btn-new">Guardar</button>
+    <button type="submit" class="btn btn-save">Guardar</button>
   </form>
+  </section>
 
-  
+
 
   <h3>Resumen global</h3>
   <table>
@@ -257,15 +259,15 @@
           </a>
         </td>
         <td>{{ d.descripcion_doc|default:"—" }}</td>
-        <td>
+        <td  class="d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
           <a
             href="{% url 'documento_update' d.pk %}"
-            class="btn btn-edit"
+            class="btn btn-edit w-100 btn-sm"
           >Editar</a>
           &nbsp;
           <a
             href="{% url 'documento_delete' d.pk %}"
-            class="btn btn-delete"
+            class="btn btn-delete w-100 btn-sm"
           >Eliminar</a>
         </td>
       </tr>
@@ -277,12 +279,15 @@
   </table>
 
   <p>
-  <a href="{% url 'embarque_list' %}">⇦ Volver al listado de embarques</a>
-  {% if doc_bol and docs_fac|length > 0 and doc_cert %}
-    <a href="{% url 'embarque_detail' contenedor.embarque.pk %}" class="btn btn-primary">Siguiente</a>
-  {% else %}
-    <a href="#" class="btn btn-primary disabled" style="pointer-events:none;opacity:0.5;">Siguiente</a>
+     {% if doc_bol and docs_fac|length > 0 and doc_cert %}
+    <a href="{% url 'embarque_detail' contenedor.embarque.pk %}" class="btn btn-edit ">Siguiente</a>
+    {% else %}
+    <a href="#" class="btn btn-edit" style="pointer-events:none;opacity:0.5;">Siguiente</a>
     <span style="color:red;"> Debes subir Bill of Lading, Factura de Exportación y Certificado de Origen.</span>
+  </p>
   {% endif %}
+<p>
+   <a href="{% url 'embarque_list' %}">⇦ Volver al listado de embarques</a>
 </p>
+ 
 {% endblock %}

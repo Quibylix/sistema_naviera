@@ -1,0 +1,115 @@
+
+/*Formulario con grid de 3 columnas */
+form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: auto;
+  gap: 1rem;                          /* espacio entre celdas */
+  padding: 1.5rem;
+}
+
+.border{
+border: 2px solid #1b2a49 !important;
+border-radius: 0.5rem;
+}
+
+/*“Puerto origen” ocupa toda la fila superior */
+form p:first-of-type {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/*Cada párrafo por defecto etiqueta arriba y ocupa una celda */
+form p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/*Checkbox “Contenedor consolidado” en 3ª columna y en línea */
+form p:has(input[type="checkbox"]) {
+  grid-column: 2;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+/*Inputs y selects de ancho completo de su celda */
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+/*Etiquetas con un poco de separación */
+form label {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: #1b2a49;
+}
+
+/*Botones (si quieres alinearlos abajo a la derecha, agrúpalos en un wrapper o usa grid-column) */
+.form-buttons {
+  /* Ocupa toda la última fila */
+  grid-column: 1 / -1;
+  margin-top: 1rem;
+
+  /* Flex interno para empujar los botones a la derecha */
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Botón Guardar */
+.btn-cancelar {
+  background-color: #1b2a49;    /* tu color principal */
+  border-color: #1b2a49;        /* versión un poco más oscura */
+  color: #ffffff;
+}
+.btn-cancelar:hover {
+  background-color: #ffffff;
+  border-color: #1b2a49;
+  color: #1b2a49;
+}
+
+/* Botón Cancelar */
+.btn-guardar {
+  background-color: #ffffff;    /* color de “peligro” suave */
+  border-color: #1b2a49;
+  color: #1b2a49;
+}
+.btn.btn-guardar:hover {
+  background-color: #1b2a49;
+  border-color: #1b2a49;
+  color: #ffffff;
+}
+/* Bordes personalizados para combo boxes */
+form select {
+  border: 1px solid #1b2a49;     /* Cambia el color y grosor */
+  border-radius: 0.25rem;        /* Esquinas redondeadas */
+  padding: 0.4rem 0.75rem;       /* Ajusta el padding si quieres */
+  background-color: #ffffff;     /* Asegura fondo blanco */
+  appearance: none;              /* Quita flecha nativa en algunos navegadores */
+}
+
+/*
+Responsive: de 3 columnas baja a 1 en móvil */
+@media (max-width: 768px) {
+  form {
+    grid-template-columns: 1fr;
+  }
+  .form-buttons {
+    grid-column: 1;
+    justify-self: start;
+  }
+}

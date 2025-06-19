@@ -1,0 +1,148 @@
+/* mercancia_manage.css */
+
+/* Variables de color */
+:root {
+  --color-primary: #1b2a49;
+  --color-secondary: #f8f9fa;
+  --color-border: #1b2a49;
+  --color-text: #333;
+}
+
+/* ===== Estilos generales ===== */
+h2, h3 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+hr {
+  border: none;
+  height: 1px;
+  background: #ddd;
+  margin: 2rem 0;
+}
+
+/* ================================= */
+/*  Contenedor de botones horizontales */
+/* ================================= */
+.form-actions {
+  display: flex;
+  gap: 1rem;              /* espacio entre botones */
+  margin-top: 1.5rem;     /* separación del grid de campos */
+  justify-content: flex-start;
+}
+
+/* ================================= */
+/*  Botones: mismo tamaño y hover   */
+/* ================================= */
+.form-actions .btnn {
+  flex: 1;               
+  max-width: 180px;   
+  height: 44px;           
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+  border-color: #14203b;
+}
+
+.form-actions .btn:hover {
+  background-color: #14203b;  /* ~15% más oscuro */
+  text-decoration: none;   
+  border-bottom: #14203b; 
+  color: #fff;  /* quita subrayado si fuera <a> */
+}
+
+/* ===== Mensaje de error ===== */
+form .text-danger {
+  grid-area: error;
+  justify-self: center;
+  margin-top: 0.5rem;
+}
+
+/* ===== Listado de mercancías ===== */
+table[border] {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+table[border] th,
+table[border] td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: center;
+}
+table[border] th {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 500;
+}
+table[border] tr:nth-child(even) {
+  background: var(--color-secondary);
+}
+table[border] a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  margin: 0 0.25rem;
+}
+
+.grid-mercancia {
+  display: grid;
+  width: 100%;                             /* ocupa todo el ancho del form */
+  grid-template-columns: repeat(3, 1fr);   /* 3 columnas iguales */
+  grid-template-rows: auto auto;           /* 2 filas: descripción / resto */
+  grid-template-areas:
+    "descripcion descripcion descripcion"  /* fila 1 */
+    "cantidad    bulto       pais";       /* fila 2 */
+  gap: 1rem;                               /* espacio entre celdas */
+  margin-bottom: 1.5rem;
+}
+
+/* Asignamos cada bloque a su área */
+.grid-mercancia .descripcion { grid-area: descripcion; }
+.grid-mercancia .cantidad    { grid-area: cantidad;    }
+.grid-mercancia .bulto       { grid-area: bulto;       }
+.grid-mercancia .pais        { grid-area: pais;        }
+
+/* Cada .item apila label + control */
+.grid-mercancia .item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label dentro de cada item */
+.grid-mercancia .item label {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Inputs, selects y textarea llenan su celda */
+.grid-mercancia .item input,
+.grid-mercancia .item select,
+.grid-mercancia .item textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+}
+
+.border{
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.5rem;
+  padding: 1.5rem;      /* espacio interno entre el borde y el form */
+  margin: 1rem 0;       /* opcional: espacio externo arriba/abajo */
+  box-sizing: border-box;
+}
+
+.btn_tab{
+  background-color: #fff;
+  color: #14203b;
+  border-color: #14203b;
+   text-decoration: none !important; 
+}
+
+.btn_tab:hover{
+  background-color: #849dd8;
+}
