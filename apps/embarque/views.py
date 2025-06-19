@@ -11,34 +11,50 @@ from django.shortcuts import redirect,get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
 class EmbarqueListView(LoginRequiredMixin, ListView):
-    """
-    • Agente de origen → muestra sus embarques propios.
-    • Agente de destino → muestra los embarques ENVIADOS cuya ruta
-                          contiene su puerto.
-    """
     model               = Embarque
     template_name       = "embarques/embarque_list.html"
     context_object_name = "embarques"
+    paginate_by         = 10
 
     def get_queryset(self):
         user = self.request.user
         qs   = super().get_queryset()
 
+        # Filtrado por rol
         if getattr(user, "is_origen", False):
-            return qs.filter(agente_origen=user).order_by("-fecha_salida")
-
-        if getattr(user, "is_destino", False):
-            return (
-                qs.filter(
-                    estado=Embarque.EST_ENVIADO,
-                    ruta__puertos=user.puerto      
-                )
-                .order_by("-fecha_salida")
+            qs = qs.filter(agente_origen=user)
+        elif getattr(user, "is_destino", False):
+            qs = qs.filter(
+                estado=Embarque.EST_ENVIADO,
+                ruta__puertos=user.puerto
             )
+        else:
+            return qs.none()
 
-        return qs.none()
+        # Filtrado “global” por q
+        termino = self.request.GET.get("q", "").strip()
+        if termino:
+            qs = qs.filter(
+                Q(id_embarque__istartswith=termino) |
+                Q(buque__nombre_buque__istartswith=termino)            |
+                Q(nombre_transportista__istartswith=termino)            |
+
+                # Desde Embarque → FK Buque, usamos buque.nombre_buque
+                Q(ruta__nombre_ruta__istartswith=termino)                |
+
+                # Puertos: usamos nombre_puerto
+                Q(puerto_procedencia__nombre_puerto__istartswith=termino)|
+                Q(puerto_actual__nombre_puerto__istartswith=termino)     |
+                Q(puerto_destino__nombre_puerto__istartswith=termino)    |
+
+                # Países: usamos nombre_pais
+                Q(pais_procedencia__nombre_pais__istartswith=termino)    |
+                Q(pais_destino__nombre_pais__istartswith=termino)
+            ).distinct()
+
+        return qs.order_by("-fecha_salida")
 
 def puede_validar(user, embarque):
     """
