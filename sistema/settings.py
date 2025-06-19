@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'sistema.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'naviera',
+        'NAME': 'sistema_naviera',
         'USER': 'postgres',               # O el usuario que hayas creado
-        'PASSWORD': 'mc22010',
+        'PASSWORD': 'admin123',
         'HOST': 'localhost',
         'PORT': '5432',                   # Asegúrate que coincida con el puerto que usas
     }
