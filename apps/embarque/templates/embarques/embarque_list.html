@@ -10,7 +10,19 @@
 <!-- Sección principal del listado -->
 <section class="container-fluid mt-4">
   <div class="align-items-center"><h2 class="mb-3 ">Listado de Embarques</h2></div>
-    
+  <form method="get" class="mb-3">
+    <div class="input-group">
+      <input
+        type="text"
+        name="q"
+        class="form-control"
+        placeholder="Buscar (ID, ruta, buque…) "
+        value="{{ request.GET.q }}"
+      >
+      <button class="btn btn-secondary" type="submit">Buscar</button>
+    </div>
+  </form>
+  
   
   <!-- Tabla responsiva de embarques -->
   <figure class="table-responsive">
@@ -72,6 +84,7 @@
               <a href="{% url 'embarque_detail' e.pk %}" class="text-info" title="Ver detalle">
                 <i class="bi bi-info-circle-fill"></i>
               </a>
+
               {% if user.is_origen and e.estado == 'borrador' %}
                 <a href="{% url 'embarque_update' e.pk %}" class="text-primary" title="Editar">
                   <i class="bi bi-pencil"></i>
@@ -82,20 +95,27 @@
                 <a href="{% url 'contenedor_create' e.pk %}" class="text-secondary" title="Crear Contenedor">
                   <i class="bi bi-bag"></i>
                 </a>
+
                 {% if e.puede_enviar %}
-                <form action="{% url 'embarque_enviar' e.pk %}" method="post" class="d-inline form-enviar" data-id="{{ e.pk }}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-link p-0 text-success btn-enviar flex-nowrap" title="Enviar">
-                  <i class="bi bi-send"></i>
-                </button>
-                </form>
+                  <form action="{% url 'embarque_enviar' e.pk %}" method="post"
+                        class="d-inline-flex align-items-center form-enviar">
+                    {% csrf_token %}
+                    <button 
+                      type="submit" 
+                      class="btn btn-link p-0 text-success btn-enviar"
+                    >
+                      <i class="bi bi-send"></i>
+                    </button>
+                  </form>
                 {% else %}
-                <span class="text-muted" title="Debe haber al menos un contenedor con mercancías y documentos completos">
-                  <i class="bi bi-send"></i>
-                </span>
+                  <button disabled class="btn btn-link p-0 text-muted">
+                    <i class="bi bi-send"></i>
+                  </button>
                 {% endif %}
+
               {% endif %}
             </nav>
+
           </td>
         </tr>
         {% empty %}

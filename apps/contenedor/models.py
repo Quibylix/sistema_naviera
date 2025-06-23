@@ -115,8 +115,8 @@ class Contenedor(models.Model):
 
 class Bulto(models.Model):
     id_bulto = models.AutoField(primary_key=True)
-    clase_bulto = models.CharField(max_length=100)
-    peso_bulto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    clase_bulto = models.CharField(max_length=100,blank=False, null=False)
+    peso_bulto = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     def __str__(self):
              return f"{self.clase_bulto}"
 
@@ -125,7 +125,7 @@ class Mercancia(models.Model):
     id_mercancia = models.AutoField(primary_key=True)
     pais = models.ForeignKey(Pais, on_delete=models.PROTECT, related_name="mercancias")
     contenedor = models.ForeignKey(Contenedor, on_delete=models.CASCADE, related_name="mercancias")
-    bulto = models.ForeignKey("Bulto", on_delete=models.SET_NULL, null=True, blank=True, related_name="mercancias")
+    bulto = models.ForeignKey("Bulto", on_delete=models.CASCADE, null=False, blank=False, related_name="mercancias")
 
     descripcion_mercancia = models.TextField()
     cantidad_bultos = models.PositiveIntegerField()
