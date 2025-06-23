@@ -1,0 +1,232 @@
+/* static/app/css/documento_form.css */
+
+/* ===== Contenedor global del formulario ===== */
+form.border {
+  background: #f8f9fa;
+  border: 1px solid #1b2a49 !important;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+/* Cada fila de campo como línea con etiqueta + control */
+.field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Etiquetas */
+.field-row label {
+  flex: 0 0 140px; /* ancho fijo */
+  font-weight: bold;
+  color: #1b2a49;
+}
+
+/* Inputs de texto, selects, textareas */
+.field-row input[type="text"],
+.field-row select,
+.field-row textarea {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+}
+
+/* Borde destacado para inputs de texto */
+.field-row input[type="text"] {
+  border: 2px solid #1b2a49;
+  transition: border-color 0.2s;
+}
+.field-row input[type="text"]:focus {
+  border-color: #163345;
+  outline: none;
+}
+
+/* Input file personalizado */
+.field-row input[type="file"] {
+  flex: 1;
+  margin: 0;
+}
+.field-row input[type="file"]::-webkit-file-upload-button {
+  background-color: #1b2a49;
+  color: #fff;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+/* ===== Estilos para el widget clearable-file-input de Django ===== */
+.field-row .clearable-file-input {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;       /* permite que el <br> separe líneas */
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* ocultar checkbox “Limpiar” y su label */
+.field-row .clearable-file-input input[type="checkbox"],
+.field-row .clearable-file-input label[for$="-clear"] {
+  display: none;
+}
+
+/* forzar salto de línea antes del botón “Elegir archivo” */
+.field-row .clearable-file-input br {
+  flex-basis: 100%;
+  height: 0;
+  margin: 0.25rem 0;
+}
+
+/* Mensajes de error bajo el control */
+.field-row .error {
+  flex: 1;
+  color: #c00;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* ===== Zona de botones ===== */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-save,
+.btn-delete {
+  display: inline-block;
+  vertical-align: middle;
+  min-width: 100px;
+  height: 38px;
+  line-height: 1.2;
+  font-size: 0.9rem;
+  padding: 0 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+/* Guardar */
+.btn-save {
+  background-color: #1b2a49;
+  color: #fff;
+  border: none;
+}
+.btn-save:hover {
+  background-color: #fff;
+  color: #1b2a49;
+  border: 1px solid #1b2a49;
+}
+
+/* Cancelar */
+.btn-delete {
+  background-color: #e0e0e0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.btn-delete:hover {
+  background-color: #d5d5d5;
+}
+
+/* Limpia floats si hiciera falta */
+form.border::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* ===== Estilos para tablas de resumen ===== */
+.table-summary {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+}
+.table-summary th,
+.table-summary td {
+  border: 1px solid #ccc;
+  padding: 0.6rem;
+  text-align: left;
+}
+.table-summary th {
+  background-color: #1b2a49;
+  color: #fff;
+  font-weight: normal;
+}
+.table-summary tr:nth-child(even) {
+  background-color: #eef2f7;
+}
+
+/* ===== Estilos globales para tablas ===== */
+h3 {
+  color: #1b2a49;
+  margin: 2rem 0 1rem;
+  font-size: 1.25rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-bottom: 2rem;
+}
+table th,
+table td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+table th {
+  background-color: #1b2a49;
+  color: #fff;
+  font-weight: normal;
+}
+table tr:nth-child(even) {
+  background-color: #f1f4f8;
+}
+table td a {
+  color: #1b2a49;
+  text-decoration: none;
+}
+table td a:hover {
+  text-decoration: underline;
+}
+
+/* Botones de acción en tablas */
+.btn-edit,
+.btn-delete {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-edit {
+  background-color: #1b2a49 !important;
+  color: #fff !important;
+  border: none;
+}
+.btn-edit:hover {
+  background-color: #163345;
+}
+.btn-delete {
+  background-color: #e0e0e0 !important;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.btn-delete:hover {
+  background-color: #d5d5d5;
+}
+table tr td[colspan="5"] {
+  padding: 1.5rem;
+  font-style: italic;
+  color: #666;
+}
+
+.clearable-file-input input[type="checkbox"],
+.clearable-file-input label[for$="-clear"] {
+  display: none !important;
+}
