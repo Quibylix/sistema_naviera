@@ -1,0 +1,10 @@
+[
+  { "model": "contenedor.tipocarga", "pk": 1, "fields": { "descripcion_tipo_carga": "Carga perecedera" } },
+  { "model": "contenedor.tipocarga", "pk": 2, "fields": { "descripcion_tipo_carga": "Carga general" } },
+  { "model": "contenedor.tipocarga", "pk": 3, "fields": { "descripcion_tipo_carga": "Carga peligrosa" } },
+  { "model": "contenedor.tipocarga", "pk": 4, "fields": { "descripcion_tipo_carga": "Carga refrigerada (alimentaria)" } },
+  { "model": "contenedor.tipocarga", "pk": 5, "fields": { "descripcion_tipo_carga": "Automóviles" } },
+  { "model": "contenedor.tipocarga", "pk": 6, "fields": { "descripcion_tipo_carga": "Maquinaria sobredimensionada" } },
+  { "model": "contenedor.tipocarga", "pk": 7, "fields": { "descripcion_tipo_carga": "Granel sólido (big-bags)" } },
+  { "model": "contenedor.tipocarga", "pk": 8, "fields": { "descripcion_tipo_carga": "Electrónicos / alta tecnología" } }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "model": "contenedor.tripletavalida",
+    "pk": 1,
+    "fields": {
+      "tipo_contenedor": "40x8 térmico, refrigerado mecánicamente y climatizado",
+      "tipo_carga":      "Carga perecedera",
+      "tipo_equipamiento":"Genset clip-on (230 V)"
+    }
+  },
+  {
+    "model": "contenedor.tripletavalida",
+    "pk": 2,
+    "fields": {
+      "tipo_contenedor": "20x8 dry estándar",
+      "tipo_carga":      "Carga general",
+      "tipo_equipamiento":"Sin equipamiento especial"
+    }
+  },
+  {
+    "model": "contenedor.tripletavalida",
+    "pk": 3,
+    "fields": {
+      "tipo_contenedor": "20-ISO tank",
+      "tipo_carga":      "Carga peligrosa",
+      "tipo_equipamiento":"Tanque de acero inoxidable"
+    }
+  }
+]

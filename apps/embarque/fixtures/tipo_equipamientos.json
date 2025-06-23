@@ -1,0 +1,8 @@
+[
+  { "model": "contenedor.tipoequipamiento", "pk": 1, "fields": { "descripcion_equip": "Genset clip-on (230 V)" } },
+  { "model": "contenedor.tipoequipamiento", "pk": 2, "fields": { "descripcion_equip": "Sin equipamiento especial" } },
+  { "model": "contenedor.tipoequipamiento", "pk": 3, "fields": { "descripcion_equip": "Tanque de acero inoxidable" } },
+  { "model": "contenedor.tipoequipamiento", "pk": 4, "fields": { "descripcion_equip": "Car-rack (estantería vehículos)" } },
+  { "model": "contenedor.tipoequipamiento", "pk": 5, "fields": { "descripcion_equip": "Lona / Tarpaulin" } },
+  { "model": "contenedor.tipoequipamiento", "pk": 6, "fields": { "descripcion_equip": "Lashing bars / chains" } }
+]

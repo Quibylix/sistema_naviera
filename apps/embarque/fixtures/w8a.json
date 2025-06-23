@@ -1,0 +1,55 @@
+[
+  {
+    "model": "embarque.pais",
+    "pk": "PA",
+    "fields": { "nombre_pais": "Panamá" }
+  },
+  {
+    "model": "embarque.pais",
+    "pk": "NI",
+    "fields": { "nombre_pais": "Nicaragua" }
+  },
+  {
+    "model": "embarque.pais",
+    "pk": "GT",
+    "fields": { "nombre_pais": "Guatemala" }
+  },
+
+  {
+    "model": "embarque.puerto",
+    "pk": "PA001",
+    "fields": { "pais": "PA", "nombre_puerto": "Puerto de Balboa" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "NI001",
+    "fields": { "pais": "NI", "nombre_puerto": "Puerto de Corinto" }
+  },
+  {
+    "model": "embarque.puerto",
+    "pk": "GT001",
+    "fields": { "pais": "GT", "nombre_puerto": "Puerto de Quetzal" }
+  },
+
+  {
+    "model": "embarque.ruta",
+    "pk": 4,
+    "fields": { "nombre_ruta": "Pacífico Centroamérica (U8A)" }
+  },
+
+  {
+    "model": "embarque.segmentoruta",
+    "pk": 11,
+    "fields": { "ruta": 4, "puerto": "PA001", "orden_ruta": 1 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk": 12,
+    "fields": { "ruta": 4, "puerto": "NI001", "orden_ruta": 2 }
+  },
+  {
+    "model": "embarque.segmentoruta",
+    "pk": 13,
+    "fields": { "ruta": 4, "puerto": "GT001", "orden_ruta": 3 }
+  }
+]

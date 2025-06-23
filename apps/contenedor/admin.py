@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contenedor, TipoContenedor, Bulto, Mercancia, TipoCarga,Documento,TipoEquipamiento,TipoDocumento
+from .models import Contenedor, TipoContenedor, Bulto, Mercancia, TipoCarga,Documento,TipoEquipamiento,TipoDocumento,TripletaValida
 
 @admin.register(Contenedor)
 class ContenedorAdmin(admin.ModelAdmin):
@@ -45,3 +45,8 @@ class EquipamientoAdmin(admin.ModelAdmin):
 class TipoDocumentoAdmin(admin.ModelAdmin):
     list_display = ("id_tipo_doc", "nombre_tipo_doc")
     search_fields = ("nombre_tipo_doc",)
+
+@admin.register(TripletaValida)
+class TripletaValidaAdmin(admin.ModelAdmin):
+    list_display = ("tipo_contenedor", "tipo_carga", "tipo_equipamiento")
+    search_fields = ("tipo_contenedor", "tipo_carga", "tipo_equipamiento")

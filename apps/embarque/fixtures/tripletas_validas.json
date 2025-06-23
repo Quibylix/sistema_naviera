@@ -1,0 +1,11 @@
+[
+  { "model": "contenedor.tripletavalida", "pk": 1, "fields": { "tipo_contenedor": "20RF", "tipo_carga": 1, "tipo_equipamiento": 1 } },
+  { "model": "contenedor.tripletavalida", "pk": 2, "fields": { "tipo_contenedor": "20DR", "tipo_carga": 2, "tipo_equipamiento": 2 } },
+  { "model": "contenedor.tripletavalida", "pk": 3, "fields": { "tipo_contenedor": "20TK", "tipo_carga": 3, "tipo_equipamiento": 3 } },
+  { "model": "contenedor.tripletavalida", "pk": 4, "fields": { "tipo_contenedor": "40DR", "tipo_carga": 2, "tipo_equipamiento": 2 } },
+  { "model": "contenedor.tripletavalida", "pk": 5, "fields": { "tipo_contenedor": "40HC", "tipo_carga": 8, "tipo_equipamiento": 2 } },
+  { "model": "contenedor.tripletavalida", "pk": 6, "fields": { "tipo_contenedor": "20OT", "tipo_carga": 6, "tipo_equipamiento": 5 } },
+  { "model": "contenedor.tripletavalida", "pk": 7, "fields": { "tipo_contenedor": "40OT", "tipo_carga": 6, "tipo_equipamiento": 5 } },
+  { "model": "contenedor.tripletavalida", "pk": 8, "fields": { "tipo_contenedor": "20FR", "tipo_carga": 5, "tipo_equipamiento": 4 } },
+  { "model": "contenedor.tripletavalida", "pk": 9, "fields": { "tipo_contenedor": "40FR", "tipo_carga": 6, "tipo_equipamiento": 6 } }
+]

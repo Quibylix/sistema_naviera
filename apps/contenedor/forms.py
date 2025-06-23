@@ -3,34 +3,41 @@ from django import forms
 from .models import Contenedor, Mercancia, Documento, TipoDocumento
 from django.core.exceptions import ValidationError
 from apps.embarque.models import Puerto # para la consulta
-
+from .models import  TripletaValida,Bulto
+from .utils import BULTOS_POR_CARGA  # Asumiendo que tienes
 class ContenedorForm(forms.ModelForm):
     class Meta:
-        model = Contenedor
+        model  = Contenedor
         fields = [
             "tipo_contenedor",
             "tipo_carga",
             "tipo_equipamiento",
-            "puerto_descarga",          
+            "puerto_descarga",
             "es_consolidado",
         ]
-    
 
+    # ──────────────────────────────────────────────
+    # CONSTRUCTOR: limita el queryset de puerto_descarga
+    # ──────────────────────────────────────────────
     def __init__(self, *args, **kwargs):
-        self.embarque = kwargs.pop("embarque")   
+        self.embarque = kwargs.pop("embarque")        # lo recibes desde la vista
         super().__init__(*args, **kwargs)
 
         ruta = self.embarque.ruta
         if ruta:
             puertos_ruta = (
                 Puerto.objects
-                .filter(segmentos__ruta=ruta)   
+                .filter(segmentos__ruta=ruta)          # puertos que aparecen en la ruta
                 .distinct()
             )
+            # Excluye el puerto de procedencia para que no se repita
             self.fields["puerto_descarga"].queryset = (
                 puertos_ruta.exclude(pk=self.embarque.puerto_procedencia_id)
             )
 
+    # ──────────────────────────────────────────────
+    # VALIDACIÓN ESPECÍFICA: puerto de descarga
+    # ──────────────────────────────────────────────
     def clean_puerto_descarga(self):
         destino = self.cleaned_data["puerto_descarga"]
         if destino == self.embarque.puerto_procedencia:
@@ -38,6 +45,55 @@ class ContenedorForm(forms.ModelForm):
                 "El puerto destino debe ser distinto al puerto de procedencia."
             )
         return destino
+
+    # ──────────────────────────────────────────────
+    # VALIDACIÓN GENERAL: “tripleta” contenedor / carga / equipamiento
+    # ──────────────────────────────────────────────
+    def clean(self):
+        """
+        1) Comprueba que los tres campos existan.
+        2) Verifica que la combinación esté en el catálogo TripletaValida.
+        3) Aplica reglas de negocio extra (ejemplos):
+           - carga perecedera ⇒ contenedor debe ser reefer
+           - carga peligrosa a granel ⇒ equipamiento tanque
+        """
+        cleaned = super().clean()  # ¡No olvides llamar al padre!
+
+        tc  = cleaned.get("tipo_contenedor")
+        tg  = cleaned.get("tipo_carga")
+        teq = cleaned.get("tipo_equipamiento")
+
+        # Si falta alguno, el propio formulario marcará el required; salimos.
+        if not all([tc, tg, teq]):
+            return cleaned
+
+        # 1) Verifica la existencia en TripletaValida
+        combinacion_ok = TripletaValida.objects.filter(
+            tipo_contenedor=tc,
+            tipo_carga=tg,
+            tipo_equipamiento=teq
+        ).exists()
+
+        if not combinacion_ok:
+            raise forms.ValidationError(
+                "La combinación seleccionada (contenedor, carga y equipamiento)"
+                " no está permitida según el catálogo de combinaciones válidas."
+            )
+
+        # 2) Ejemplos de reglas de negocio adicionales
+        if getattr(tg, "es_perecedera", False) and not getattr(tc, "es_reefer", False):
+            self.add_error(
+                "tipo_contenedor",
+                "Las cargas perecederas deben transportarse en un contenedor refrigerado."
+            )
+
+        if getattr(tg, "es_peligrosa", False) and not getattr(teq, "es_tanque", False):
+            self.add_error(
+                "tipo_equipamiento",
+                "La carga peligrosa a granel requiere equipamiento de tipo tanque."
+            )
+
+        return cleaned
 
 class MercanciaForm(forms.ModelForm):
     REQUIRED = ("bulto", "cantidad_bultos") 
@@ -56,6 +112,15 @@ class MercanciaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.contenedor = kwargs.pop("contenedor")
         super().__init__(*args, **kwargs)
+
+        # —— FILTRO DINÁMICO —— #
+        carga_id = self.contenedor.tipo_carga_id
+        permitidos = BULTOS_POR_CARGA.get(carga_id, [])
+        if permitidos:
+            self.fields["bulto"].queryset = Bulto.objects.filter(pk__in=permitidos)
+        else:
+            # Si no hay lista definida, muestra todos (o ninguno, como prefieras)
+            self.fields["bulto"].queryset = Bulto.objects.none()
 
     def save(self, commit=True):
         obj = super().save(commit=False)

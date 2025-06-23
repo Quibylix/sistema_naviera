@@ -1,0 +1,12 @@
+[
+  { "model": "contenedor.bulto", "pk": 1, "fields": { "clase_bulto": "Caja",      "peso_bulto": 10  } },
+  { "model": "contenedor.bulto", "pk": 2, "fields": { "clase_bulto": "Pallet",    "peso_bulto": 600 } },
+  { "model": "contenedor.bulto", "pk": 3, "fields": { "clase_bulto": "Saco",      "peso_bulto": 60  } },
+  { "model": "contenedor.bulto", "pk": 4, "fields": { "clase_bulto": "Tambor",    "peso_bulto": 200 } },
+  { "model": "contenedor.bulto", "pk": 5, "fields": { "clase_bulto": "Bolsa",     "peso_bulto": 25  } },
+  { "model": "contenedor.bulto", "pk": 6, "fields": { "clase_bulto": "Barril",    "peso_bulto": 100 } },
+  { "model": "contenedor.bulto", "pk": 7, "fields": { "clase_bulto": "Rollo",     "peso_bulto": 250 } },
+  { "model": "contenedor.bulto", "pk": 8, "fields": { "clase_bulto": "Fardo",     "peso_bulto": 225 } },
+  { "model": "contenedor.bulto", "pk": 9, "fields": { "clase_bulto": "Bobina",    "peso_bulto": 500 } },
+  { "model": "contenedor.bulto", "pk":10, "fields": { "clase_bulto": "Bidón",     "peso_bulto": 28  } }
+]

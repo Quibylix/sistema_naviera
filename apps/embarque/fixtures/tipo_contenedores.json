@@ -1,0 +1,11 @@
+[
+  { "model": "contenedor.tipocontenedor", "pk": "20DR", "fields": { "nombre_tipo_cont": "20' Dry estándar" } },
+  { "model": "contenedor.tipocontenedor", "pk": "20RF", "fields": { "nombre_tipo_cont": "20' Reefer" } },
+  { "model": "contenedor.tipocontenedor", "pk": "40DR", "fields": { "nombre_tipo_cont": "40' Dry estándar" } },
+  { "model": "contenedor.tipocontenedor", "pk": "40HC", "fields": { "nombre_tipo_cont": "40' High Cube Dry" } },
+  { "model": "contenedor.tipocontenedor", "pk": "20OT", "fields": { "nombre_tipo_cont": "20' Open Top" } },
+  { "model": "contenedor.tipocontenedor", "pk": "40OT", "fields": { "nombre_tipo_cont": "40' Open Top" } },
+  { "model": "contenedor.tipocontenedor", "pk": "20TK", "fields": { "nombre_tipo_cont": "20' ISO Tank" } },
+  { "model": "contenedor.tipocontenedor", "pk": "20FR", "fields": { "nombre_tipo_cont": "20' Flat Rack" } },
+  { "model": "contenedor.tipocontenedor", "pk": "40FR", "fields": { "nombre_tipo_cont": "40' Flat Rack" } }
+]
