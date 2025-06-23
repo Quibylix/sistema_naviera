@@ -26,6 +26,17 @@ class TipoEquipamiento(models.Model):
 
     def __str__(self):
         return self.descripcion_equip
+    
+class TripletaValida(models.Model):
+    tipo_contenedor  = models.ForeignKey(TipoContenedor, on_delete=models.CASCADE)
+    tipo_carga       = models.ForeignKey(TipoCarga,       on_delete=models.CASCADE)
+    tipo_equipamiento= models.ForeignKey(TipoEquipamiento,    on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("tipo_contenedor", "tipo_carga", "tipo_equipamiento")
+        verbose_name    = "Combinación válida"
+        verbose_name_plural = "Combinaciones válidas"
+
 
 class Contenedor(models.Model):
     id_contenedor = models.CharField(primary_key=True, max_length=16,editable=False)

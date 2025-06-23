@@ -1,3 +1,4 @@
+{# apps/contenedor/templates/contenedor_form.html #}
 {% extends "base.html" %}
 {% load static widget_tweaks %}
 {# Enlace CSS específico para este form #}
@@ -7,6 +8,13 @@
 {% block content %}
 <h2 class="text-center mb-4">Crear contenedor para embarque {{ embarque.id_embarque }}</h2>
  
+<div class="text-end mb-2">
+  <a href="{% static 'docs/catalogo.pdf' %}"
+     target="_blank"
+     class="btn btn-outline-info btn-sm">
+     📄 Combinaciones válidas
+  </a>
+</div>
 <div class="border">
 
 <form method="post">
